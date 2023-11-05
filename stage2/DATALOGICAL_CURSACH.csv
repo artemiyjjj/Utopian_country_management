@@ -1,0 +1,46 @@
+Я бы,имя,Библиотека форм,Идентификатор страницы,Содержится в,группа,Линия Источник,Линия назначения,Исходная стрелка,Стрелка назначения,Состояние,Текстовая область 1,Текстовая область 2,Текстовая область 3,Текстовая область 4,Текстовая область 5,Текстовая область 6,Текстовая область 7,Текстовая область 8,Текстовая область 9,Текстовая область 10,Текстовая область 11,Текстовая область 12,Текстовая область 13,Комментарии
+1,Документ,,,,,,,,,Черновик,DATALOGICAL_CURSACH,,,,,,,,,,,,,
+2,страница,,,,,,,,,,ER-диаграмма базы данных (с «вороньими лапками»),,,,,,,,,,,,,
+3,сущность,Отношения сущностей,2,,,,,,,,Family,id,integer,craft_type_id,integer,,,,,,,,,
+4,сущность,Отношения сущностей,2,,,,,,,,Person,id,integer,name,text,motherland_id,integer,family_id,integer,,,,,
+5,сущность,Отношения сущностей,2,,,,,,,,Person_position_history,id,integer,person_id,integer,position_id,integer,dismissal_date,date,hire_date,date,,,"[{""Закрытые"":true,""Комментарии"":[{""Временная метка"":""2023-10-12T14:54:53.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""id надо, потому что персон может несколько раз вставать на одну позицию\nИли считаешь, что дату в первичный ключ?""}]},{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T19:13:37.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""hire_date <= dismissal_date\nhire_date NOT NULL""}]}]"
+6,сущность,Отношения сущностей,2,,,,,,,,Position,id,integer,name,text,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T19:13:55.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""name UNIQUE NOT NULL""}]}]"
+7,сущность,Отношения сущностей,2,,,,,,,,Country,id,integer,name,text,leader_id,integer,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-10-26T16:19:02.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""leader_id On delete set null""}]}]"
+8,сущность,Отношения сущностей,2,,,,,,,,Political_status,id,integer,name,text,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T19:28:27.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""name UNIQUE NOT NULL""}]}]"
+9,сущность,Отношения сущностей,2,,,,,,,,Resource,id,integer,resource_storage_id,integer,initial_quantity,double precision,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T18:03:10.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""initial_quantity > 0\nNot null""}]}]"
+10,сущность,Отношения сущностей,2,,,,,,,,Resource_type,id,integer,resource_type,text,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T18:05:23.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""resource_type unique""}]}]"
+11,сущность,Отношения сущностей,2,,,,,,,,Country_relationship_event_history,id,integer,event_groups_id,integer,political_status_id,integer,start_event_date,date,end_event_date,date,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T19:32:42.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""start date <= end date\nstart not null\nevent_groups count > 2""}]}]"
+12,сущность,Отношения сущностей,2,,,,,,,,Family_resource_ownership,family_id,integer,resource_id,integer,quantity,double precision,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T18:03:26.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""quantity >= 0 \nNot NULL""}]}]"
+13,сущность,Отношения сущностей,2,,,,,,,,Resource_storage,id,integer,resource_type_id,integer,total_quantity,double precision,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T18:02:52.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""total_quantity >= 0\nNot null""}]}]"
+14,сущность,Отношения сущностей,2,,,,,,,,Report,id,integer,title,text,text,text,sender_id,integer,receiver_id,integer,delievered,boolean,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T20:02:20.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""sender, receiver on update cascade on delete set null\ndelivered not null\ntitle, text not null""}]}]"
+15,сущность,Отношения сущностей,2,,,,,,,,Building_construction_artefact,building_id,integer,responsible_person_id,integer,construction_beginig,date,construction_end,date,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T20:18:58.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""building on update cascade on delete set null(пока)\nresponsible_person on update cascade on delete set null\nend date > beggining date""}]}]"
+16,сущность,Отношения сущностей,2,,,,,,,,Building,id,integer,building_type_id,integer,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T20:10:58.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""type on update cascade on delete restrict""},{""Временная метка"":""2023-11-05T20:14:29.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""мб добавить сущность адреса для сохранения всех репорте о стройке на таком то адресе""}]}]"
+17,сущность,Отношения сущностей,2,,,,,,,,Building_type,id,integer,type_name,text,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T20:10:17.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""type_name Unique Not null""}]}]"
+18,сущность,Отношения сущностей,2,,,,,,,,Craft_type,id,integer,cragt_name,text,,,,,,,,,
+19,сущность,Отношения сущностей,2,,,,,,,,People_detachment_to_building,person_id,integer,building_id,integer,,,,,,,,,
+20,сущность,Отношения сущностей,2,,,,,,,,Resource_usage,id,integer,resource_id,integer,resource_usage_type_id,integer,,,,,,,
+21,сущность,Отношения сущностей,2,,,,,,,,Resource_usage_type,id,integer,amount,double precision,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-11-05T18:04:02.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""amount > 0""}]}]"
+22,сущность,Отношения сущностей,2,,,,,,,,Event_groups,id,integer,group_id,integer,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-10-26T15:12:29.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""group_id on delete restrict""}]}]"
+23,сущность,Отношения сущностей,2,,,,,,,,Event_group,id,integer,county_id,integer,,,,,,,,,"[{""Закрытые"":false,""Комментарии"":[{""Временная метка"":""2023-10-26T15:17:41.000Z"",""Создатель"":""Артемий Романов"",""Контент"":""содержит минимум одну страну;\ncountry_id on delete cascade""}]}]"
+24,Линия,,2,,,4,5,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+25,Линия,,2,,,6,5,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+26,Линия,,2,,,7,4,CFN ERD One Arrow,CFN ERD One Arrow,,,,,,,,,,,,,,,
+27,Линия,,2,,,9,12,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+28,Линия,,2,,,3,12,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+29,Линия,,2,,,8,11,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+30,Линия,,2,,,3,4,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+31,Линия,,2,,,13,9,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+32,Линия,,2,,,4,14,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+33,Линия,,2,,,4,14,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+34,Линия,,2,,,16,15,CFN ERD Exactly One Arrow,CFN ERD Exactly One Arrow,,,,,,,,,,,,,,,
+35,Линия,,2,,,15,4,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+36,Линия,,2,,,18,3,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+37,Линия,,2,,,16,19,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+38,Линия,,2,,,4,19,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+39,Линия,,2,,,9,20,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+40,Линия,,2,,,20,21,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+41,Линия,,2,,,11,22,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+42,Линия,,2,,,22,23,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+43,Линия,,2,,,23,7,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+44,Линия,,2,,,10,13,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,
+45,Линия,,2,,,17,16,CFN ERD One Arrow,CFN ERD Many Arrow,,,,,,,,,,,,,,,

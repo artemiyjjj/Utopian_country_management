@@ -13,14 +13,31 @@ CREATE TABLE IF NOT EXISTS Political_status
     PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS Event_group
+CREATE TABLE IF NOT EXISTS Country_relationship_event_history
 (
-    id         SERIAL,
-    country_id integer REFERENCES Country (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    id                  SERIAL,
+    political_status_id integer REFERENCES Political_status (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    start_event_date    date NOT NULL,
+    end_event_date      date
+        CONSTRAINT is_after_start CHECK ( end_event_date >= start_event_date ),
     PRIMARY KEY (id)
 );
 
-CREATE FUNCTION count_group_countries(group_id integer) RETURNS bigint AS
+CREATE TABLE IF NOT EXISTS Event_group
+(
+    id SERIAL,
+    name text NOT NULL UNIQUE,
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS Event_group_countries
+(
+    group_id   integer REFERENCES Event_group (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    country_id integer REFERENCES Country (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (group_id, country_id)
+);
+
+CREATE OR REPLACE FUNCTION count_group_countries(group_id integer) RETURNS bigint AS
 $$
 SELECT count(*)
 FROM Event_group
@@ -29,30 +46,17 @@ $$ LANGUAGE sql;
 
 CREATE TABLE IF NOT EXISTS Event_groups
 (
-    id             SERIAL,
+    id             integer REFERENCES Country_relationship_event_history (id) ON UPDATE CASCADE ON DELETE CASCADE,
     event_group_id integer REFERENCES Event_group (id) ON UPDATE CASCADE ON DELETE RESTRICT
         CONSTRAINT not_empty CHECK ( count_group_countries(event_group_id) >= 1 ),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id, event_group_id)
 );
 
-CREATE FUNCTION count_event_groups(groups_id integer) RETURNS bigint AS
-$$
-SELECT count(*)
-FROM Event_groups
-WHERE id = groups_id;
-$$ LANGUAGE sql;
+-- CREATE OR REPLACE FUNCTION count_event_groups(country_event_id integer) RETURNS bigint AS
+-- $$
+-- SELECT count(*) FROM Event_groups WHERE id = country_event_id;
+-- $$ LANGUAGE sql;
 
-CREATE TABLE IF NOT EXISTS Country_relationship_event_history
-(
-    id                  SERIAL,
-    event_groups_id     integer REFERENCES Event_groups (id) ON UPDATE CASCADE ON DELETE Restrict
-        CONSTRAINT enough_event_participants CHECK ( count_event_groups(event_groups_id) >= 2 ),
-    political_status_id integer REFERENCES Political_status (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    start_event_date    date NOT NULL,
-    end_event_date      date
-        CONSTRAINT is_after_start CHECK ( end_event_date >= start_event_date ),
-    PRIMARY KEY (id)
-);
 
 CREATE TABLE IF NOT EXISTS Resource_type
 (
@@ -93,6 +97,7 @@ CREATE TABLE IF NOT EXISTS Resource_usage
     resource_usage_type_id integer REFERENCES Resource_usage_type (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     PRIMARY KEY (id)
 );
+
 
 CREATE TABLE IF NOT EXISTS Craft_type
 (
@@ -139,8 +144,8 @@ CREATE TABLE IF NOT Exists Position
 CREATE TABLE IF NOT EXISTS Person_position_history
 (
     id             SERIAL,
-    person_id      integer REFERENCES Person (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    position_id    integer REFERENCES Position (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    person_id      integer REFERENCES Person (id) ON UPDATE CASCADE ON DELETE CASCADE NOT NULL,
+    position_id    integer REFERENCES Position (id) ON UPDATE CASCADE ON DELETE RESTRICT NOT NULL,
     hire_date      date NOT NULL,
     dismissal_date date
         CONSTRAINT is_after_hire CHECK (hire_date <= dismissal_date),

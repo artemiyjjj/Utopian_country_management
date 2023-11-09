@@ -148,7 +148,7 @@ $$
     BEGIN
         SELECT get_person_id_by_name(leader_name) INTO person_leader_id;
         SELECT get_country_id_by_name(country_name) INTO country_id;
-        IF country_id IS NOT NULL && person_leader_id IS NOT NULL
+        IF country_id IS NOT NULL and person_leader_id IS NOT NULL
             THEN
                 UPDATE country
                     SET leader_id = person_leader_id
@@ -177,7 +177,7 @@ $$
     BEGIN
         SELECT get_country_id_by_name(country_name) INTO country_id_val;
         SELECT get_event_group_id_by_name(group_name) INTO group_id_val;
-        IF group_id_val IS NOT NULL && country_id_val IS NOT NULL
+        IF group_id_val IS NOT NULL and country_id_val IS NOT NULL
             THEN
                 INSERT INTO event_group_countries (group_id, country_id)
                 VALUES (group_id_val, country_id_val)
@@ -192,7 +192,7 @@ $$
         group_id integer;
     BEGIN
         SELECT get_event_group_id_by_name(group_name) INTO group_id;
-        IF event_group_id IS NOT NULL && is_country_relationship_event_exists(event_id)
+        IF event_group_id IS NOT NULL and is_country_relationship_event_exists(event_id)
             THEN
                 INSERT INTO event_groups (id, event_group_id) VALUES (event_id, group_id)
                 RETURNING (id, event_group_id);
@@ -215,20 +215,20 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, groups_id integer) RETURNS integer AS
-$$
-    DECLARE
-        political_status_id_val integer;
-    BEGIN
-        SELECT get_political_status_id_by_name(political_status_name) INTO political_status_id_val;
-        IF political_status_id_val IS NOT NULL && is_event_groups_exists(groups_id) && event_start_date IS NOT NULL
-            THEN
-                INSERT INTO country_relationship_event_history (political_status_id, event_groups_id, start_event_date)
-                VALUES (political_status_id_val, groups_id, event_start_date)
-                RETURNING id;
-        end if;
-    END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, groups_id integer) RETURNS integer AS
+-- $$
+--     DECLARE
+--         political_status_id_val integer;
+--     BEGIN
+--         SELECT get_political_status_id_by_name(political_status_name) INTO political_status_id_val;
+--         IF political_status_id_val IS NOT NULL and is_event_groups_exists(groups_id) and event_start_date IS NOT NULL
+--             THEN
+--                 INSERT INTO country_relationship_event_history (political_status_id, start_event_date)
+--                 VALUES (political_status_id_val, groups_id, event_start_date)
+--                 RETURNING id;
+--         end if;
+--     END;
+-- $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_name_set text[]) RETURNS integer AS
 $$
@@ -274,19 +274,27 @@ $$
         resource_type_id_val integer;
     BEGIN
         SELECT get_resource_type_id_by_name(resource_type_name) INTO resource_type_id_val;
-        IF resource_type_name IS NOT NULL && resource_storage_quantity >= 0
+        IF resource_type_name IS NOT NULL and resource_storage_quantity >= 0
             THEN
                 INSERT INTO resource_storage (resource_type_id, total_quantity)
                 VALUES (resource_type_id_val, resource_storage_quantity)
-                RETURNING resource_storage.id;
+                RETURNING id;
         END IF;
     END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION _insert_resource_storage (_resource_type_name text, _resource_storage_quantity double precision) RETURNS integer AS
+    $$
+
+        INSERT INTO resource_storage (resource_type_id, total_quantity)
+        VALUES ((SELECT id FROM resource_type WHERE resource_type = _resource_type_name), _resource_storage_quantity )
+        RETURNING id;
+    $$ language sql;
+
 CREATE OR REPLACE FUNCTION insert_resource (storage_id integer, resource_initial_quantity double precision) RETURNS integer AS
 $$
     BEGIN
-        IF is_resource_storage_exists(storage_id) && resource_initial_quantity >= 0
+        IF is_resource_storage_exists(storage_id) and resource_initial_quantity >= 0
             THEN INSERT INTO Resource (resource_storage_id, initial_quantity)
                 VALUES (storage_id, resource_initial_quantity)
                 RETURNING id;
@@ -306,7 +314,7 @@ $$
         resource_usage_type_id_val integer;
     BEGIN
         SELECT get_or_insert_resource_usage_type_id_by_amount(resource_usage_type_amount) INTO resource_usage_type_id_val;
-        IF is_resource_exists(resource_id_val) && resource_usage_type_id_val IS NOT NULL
+        IF is_resource_exists(resource_id_val) and resource_usage_type_id_val IS NOT NULL
             THEN
                 INSERT INTO resource_usage (resource_id, resource_usage_type_id)
                 VALUES (resource_id_val, resource_usage_type_id_val)
@@ -345,7 +353,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION insert_family_resource_ownership (family_id_val integer, resource_id_val integer, resource_quantity double precision) RETURNS family_resource_ownership AS
 $$
     BEGIN
-        IF is_family_exists(family_id_val) && is_resource_exists(resource_id_val) && resource_quantity >= 0
+        IF is_family_exists(family_id_val) and is_resource_exists(resource_id_val) and resource_quantity >= 0
             THEN
                 INSERT INTO family_resource_ownership (family_id, resource_id, quantity)
                 VALUES (family_id_val, resource_id_val, resource_quantity)
@@ -430,6 +438,22 @@ $$
     INSERT INTO Position (name) VALUES (position_name) RETURNING (position.id);
 $$ LANGUAGE sql;
 
+CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _date date ) RETURNS integer AS
+    $$
+
+        INSERT INTO person_position_history (person_id, position_id, hire_date)
+        VALUES ((SELECT id FROM person WHERE name = _person), (SELECT id FROM Position WHERE name = _position), _date )
+        RETURNING id;
+    $$ language sql;
+
+CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _hire_date date, _dismissal_date date ) RETURNS integer AS
+    $$
+
+        INSERT INTO person_position_history (person_id, position_id, hire_date, dismissal_date)
+        VALUES ((SELECT id FROM person WHERE name = _person), (SELECT id FROM Position WHERE name = _position), _hire_date, _dismissal_date )
+        RETURNING id;
+    $$ language sql;
+
 CREATE OR REPLACE FUNCTION insert_person_position_history (person_name text, person_position text, person_hire_date date) RETURNS integer AS
 $$
     DECLARE
@@ -438,11 +462,14 @@ $$
     BEGIN
         SELECT get_person_id_by_name(person_name) INTO person_id_val;
         SELECT get_position_id_by_name(person_position) INTO person_position_id;
-        IF person_id_val IS NOT NULL && person_position_id IS NOT NULL && person_hire_date IS NOT NULL
+        IF person_id_val IS NOT NULL and person_position_id IS NOT NULL and person_hire_date IS NOT NULL
             THEN
                 INSERT INTO person_position_history (person_id, position_id, hire_date)
                 VALUES (person_id_val, person_position_id, person_hire_date)
-                RETURNING person_position_history.id;
+                RETURNING id;
+        ELSE
+            RAISE EXCEPTION 'Wrong inputs.';
+            Return null;
         END iF;
     END;
 $$ LANGUAGE plpgsql;
@@ -465,7 +492,7 @@ $$
     BEGIN
         SELECT get_person_id_by_name(person_sender_name) INTO person_sender_id;
         SELECT get_person_id_by_name(person_receiver_name) INTO person_receiver_id;
-        IF person_sender_id IS NOT NULL && person_receiver_id IS NOT NULL && report_title IS NOT NULL && report_contents IS NOT NULL
+        IF person_sender_id IS NOT NULL and person_receiver_id IS NOT NULL and report_title IS NOT NULL and report_contents IS NOT NULL
             THEN
                 INSERT INTO Report (title, contents, sender_id, receiver_id, delivered)
                 VALUES (report_title, report_contents, person_sender_id, person_receiver_id, FALSE)
@@ -509,7 +536,7 @@ $$
     BEGIN
         SELECT get_person_id_by_name(responsible_person_name) INTO responsible_id;
         SELECT get_building_type_id_by_name(new_building_type) INTO new_building_type_id;
-        IF responsible_id IS NOT NULL && new_building_type_id IS NOT NULL && building_construction_beginning_date IS NOT NULL
+        IF responsible_id IS NOT NULL and new_building_type_id IS NOT NULL and building_construction_beginning_date IS NOT NULL
             THEN
                 SELECT insert_building(new_building_type_id) INTO new_building_id;
                 INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date) VALUES (new_building_id, responsible_person_id, building_construction_beginning_date)
@@ -525,7 +552,7 @@ $$
         new_building_id integer;
     BEGIN
         SELECT get_person_id_by_name(responsible_person_name) INTO responsible_id;
-        IF responsible_id IS NOT NULL && is_building_exists(new_building_id) && building_construction_beginning_date IS NOT NULL
+        IF responsible_id IS NOT NULL and is_building_exists(new_building_id) and building_construction_beginning_date IS NOT NULL
             THEN
                 INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date)
                 VALUES (new_building_id, responsible_id, building_construction_beginning_date)
@@ -537,7 +564,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION update_building_construction_artefact (new_building_id integer, building_construction_end_date date) RETURNS building AS
 $$
     BEGIN
-        IF is_building_exists(new_building_id) && building_construction_end_date IS NOT NULL
+        IF is_building_exists(new_building_id) and building_construction_end_date IS NOT NULL
             THEN
                 UPDATE building_construction_artefact
                 SET construction_end_date = building_construction_end_date
@@ -553,7 +580,7 @@ $$
         detached_person_id integer;
     BEGIN
         SELECT get_person_id_by_name(detached_person_name) INTO detached_person_id;
-        IF is_building_exists(new_building_id) && detached_person_id IS NOT NULL
+        IF is_building_exists(new_building_id) and detached_person_id IS NOT NULL
             THEN
                 INSERT INTO people_detachment_to_building (person_id, building_id)
                 VALUES (detached_person_id, new_building_id)

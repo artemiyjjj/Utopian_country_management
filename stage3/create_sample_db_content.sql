@@ -33,11 +33,11 @@ SELECT insert_resource_type('Stone');
 SELECT insert_resource_type('Gold');
 SELECT insert_resource_type('Oil');
 
-SELECT insert_resource_storage('Water', 3000.0);
-SELECT insert_resource_storage('Water', 4789.3);
-SELECT insert_resource_storage('Gold', 142.0);
-SELECT insert_resource_storage('Food', 2081.3);
-SELECT insert_resource_storage('Oil', 392.0);
+SELECT _insert_resource_storage('Water', 3000.0);
+SELECT _insert_resource_storage('Water', 4789.3);
+SELECT _insert_resource_storage('Gold', 142.0);
+SELECT _insert_resource_storage('Food', 2081.3);
+SELECT _insert_resource_storage('Oil', 392.0);
 
 SELECT insert_person('Sigizmund III');
 SELECT insert_person('Petr I');
@@ -46,12 +46,12 @@ SELECT insert_person('Person 1254');
 SELECT insert_person('Sigizmund IV');
 SELECT insert_person('EKATERINA I');
 
-SELECT insert_person_position_history('Sigizmund III', 'Foreign king', '22.10.2000');
-SELECT insert_person_position_history('Sigizmund IV', 'Foreign diplomat', '05.03.2001');
-SELECT insert_person_position_history('Petr I', 'Foreign king', '30.05.1998');
-SELECT insert_person_position_history('EKATERINA I', 'Foreign diplomat', '30.05.1998');
-SELECT insert_person_position_history('The Queen', 'Foreign king', '17.04.2002');
-SELECT insert_person_position_history('Person 1254', 'kniaz', '20.08.2000');
+SELECT _insert_position_history('Sigizmund III', 'Foreign king', make_date(2000, 10, 20));
+SELECT _insert_position_history('Sigizmund IV', 'Foreign diplomat', make_date(2001, 3, 5));
+SELECT _insert_position_history('Petr I', 'Foreign king', make_date(1998, 5, 30));
+SELECT _insert_position_history('EKATERINA I', 'Foreign diplomat', make_date(1998, 5, 30));
+SELECT _insert_position_history('The Queen', 'Foreign king', make_date(2002, 4, 17));
+SELECT _insert_position_history('Person 1254', 'kniaz', make_date(2000, 4, 17));
 
 SELECT insert_country('Utopia', 'Person 1254');
 SELECT insert_country('Poland', 'Sigizmund III');
@@ -72,7 +72,7 @@ SELECT insert_person('Mr. Undwick', 'Utopia');
 SELECT insert_person('Anton Mirniy', 'Utopia');
 SELECT insert_person('Evgeniy Krivchov', 'Utopia');
 
-
+SELECT make_date(2023, 10, 9);
 
 SELECT insert_family('Farming', [
     get_person_id_by_name('Kopatich')
@@ -96,9 +96,9 @@ SELECT insert_family('Teaching', [
 SELECT insert_family('Factory worker', [
     get_person_id_by_name('Kirill Abvgd')
     ]);
-SELECT insert_family('Copper', [
+SELECT insert_family('Copper', {
     get_person_id_by_name('Evgeniy Krivchov')
-    ]);
+           });
 
 
 SELECT insert_event_group('Antanta');

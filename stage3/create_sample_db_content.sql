@@ -33,11 +33,11 @@ SELECT insert_resource_type('Stone');
 SELECT insert_resource_type('Gold');
 SELECT insert_resource_type('Oil');
 
-SELECT _insert_resource_storage('Water', 3000.0);
-SELECT _insert_resource_storage('Water', 4789.3);
-SELECT _insert_resource_storage('Gold', 142.0);
-SELECT _insert_resource_storage('Food', 2081.3);
-SELECT _insert_resource_storage('Oil', 392.0);
+SELECT _insert_resource_storage('Water', 3000.0, 3000.0);
+SELECT _insert_resource_storage('Water', 4789.3, 4000);
+SELECT _insert_resource_storage('Gold', 142.0, 120);
+SELECT _insert_resource_storage('Food', 2081.3, 1700);
+SELECT _insert_resource_storage('Oil', 392.0, 390);
 
 SELECT insert_person('Sigizmund III');
 SELECT insert_person('Petr I');
@@ -59,7 +59,7 @@ SELECT insert_country('Finland', 'Petr I');
 SELECT insert_country('Sweden');
 
 -- SELECT update_country('Poland', 'Sigizmund IV');
-SELECT update_country('Sweden', 'The Queen');
+-- SELECT update_country('Sweden', 'The Queen');
 
 SELECT insert_person('Ivan Semenich', 'Poland');
 SELECT insert_person('Person 5347', 'Utopia');
@@ -71,8 +71,6 @@ SELECT insert_person('Kopatich', 'Utopia');
 SELECT insert_person('Mr. Undwick', 'Utopia');
 SELECT insert_person('Anton Mirniy', 'Utopia');
 SELECT insert_person('Evgeniy Krivchov', 'Utopia');
-
-SELECT make_date(2023, 10, 9);
 
 SELECT insert_family('Farming', [
     get_person_id_by_name('Kopatich')
@@ -96,9 +94,9 @@ SELECT insert_family('Teaching', [
 SELECT insert_family('Factory worker', [
     get_person_id_by_name('Kirill Abvgd')
     ]);
-SELECT insert_family('Copper', {
-    get_person_id_by_name('Evgeniy Krivchov')
-           });
+-- SELECT insert_family('Copper', {
+--     get_person_id_by_name('Evgeniy Krivchov')
+--            });
 
 
 SELECT insert_event_group('Antanta');

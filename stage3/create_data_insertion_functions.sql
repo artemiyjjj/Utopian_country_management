@@ -459,7 +459,7 @@ $$ language sql;
 --     END;
 -- $$ Language plpgsql;
 
-CREATE OR REPLACE FUNCTION update_person (_name text, _new_family_id text) RETURNS person AS
+CREATE OR REPLACE FUNCTION update_person (_name text, _new_family_id integer) RETURNS person AS
 $$
     UPDATE person
     SET family_id = _new_family_id

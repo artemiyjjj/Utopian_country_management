@@ -59,6 +59,12 @@ DROP FUNCTION IF EXISTS insert_resource_type (resource_type_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_resource_storage (resource_type_name text, resource_storage_quantity double precision) CASCADE;
 
+DROP FUNCTION IF EXISTS insert_resource_storage(resource_type_name text, resource_storage_quantity double precision, resource_storage_current_quantity double precision) CASCADE;
+
+DROP FUNCTION IF EXISTS _insert_resource_storage(_resource_type_name text, _resource_storage_quantity double precision) CASCADE;
+
+DROP FUNCTION IF EXISTS _insert_resource_storage(_resource_type_name text, _resource_storage_quantity double precision, _resource_storage_current_quantity double precision) CASCADE;
+
 DROP FUNCTION IF EXISTS insert_resource (storage_id integer, resource_initial_quantity double precision) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_resource_usage_type (resource_usage_type_amount double precision) CASCADE;
@@ -71,6 +77,8 @@ DROP FUNCTION IF EXISTS insert_craft_type (craft_type_name text) CASCADE;
 DROP FUNCTION IF EXISTS insert_family(craft_type_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_family(craft_type_name text, VARIADIC person_id integer[]) CASCADE;
+
+DROP FUNCTION IF EXISTS insert_family_resource_ownership(family_id_val integer, resource_id_val integer) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_family_resource_ownership (family_id_val integer, resource_id_val integer, resource_quantity double precision) CASCADE;
 
@@ -87,7 +95,15 @@ DROP FUNCTION IF EXISTS update_person (_name text, _new_family_id text) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_position (position_name text) CASCADE;
 
+DROP FUNCTION IF EXISTS insert_position_craft_type_relation(position_name text, craft_type_name text) CASCADE;
+
 DROP FUNCTION IF EXISTS insert_person_position_history(person_name text, person_position text, person_hire_date date) CASCADE;
+
+DROP FUNCTION IF EXISTS insert_position_history(_person text, _position text, _date date) CASCADE;
+
+DROP FUNCTION IF EXISTS _insert_position_history(_person text, _position text, _date date) CASCADE;
+
+DROP FUNCTION IF EXISTS _insert_position_history(_person text, _position text, _hire_date date, _dismissal_date date) CASCADE;
 
 DROP FUNCTION IF EXISTS update_person_position_history (person_position_history_id integer, person_dismissal_date date) CASCADE;
 
@@ -108,3 +124,6 @@ DROP FUNCTION IF EXISTS insert_building_construction_artefact (responsible_perso
 DROP FUNCTION IF EXISTS update_building_construction_artefact (new_building_id integer, building_construction_end_date date) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_people_detachment_to_building (detached_person_name text, the_building_id integer) CASCADE;
+
+
+DROP FUNCTION IF EXISTS allocate_resource_to_family(_family_id integer, _resource_type_name text, _resource_quantity double precision) CASCADE;

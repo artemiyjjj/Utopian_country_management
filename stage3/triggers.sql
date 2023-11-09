@@ -91,7 +91,7 @@ create or replace trigger check_person_family_transition_trigger() REturns trigg
 
 -- Создание индексов
 
-create or replace procedure allocate_resource_to_family(_family_id integer, _resource_type_name text, _resource_quantity double precision) AS
+create or replace function allocate_resource_to_family(_family_id integer, _resource_type_name text, _resource_quantity double precision) RETURNS void AS
 $$
     DECLARE
         _resource_type_id integer;
@@ -100,11 +100,10 @@ $$
     BEGIN
         SELECT get_resource_type_id_by_name(_resource_type_name) INTO _resource_type_id;
         SELECT id FROM resource_storage where resource_type_id = _resource_type_id and current_quantity >= _resource_quantity INTO _resource_storage_id;
-        BEGIN;
-            UPDATE resource_storage SET current_quantity = current_quantity - _resource_quantity
-            WHERE id = _resource_storage_id;
-            SELECT insert_resource(_resource_storage_id, _resource_quantity) INTO _resource_id;
-            SELECT insert_family_resource_ownership(_family_id, _resource_id);
-        END;
+        UPDATE resource_storage SET current_quantity = current_quantity - _resource_quantity
+        WHERE id = _resource_storage_id;
+        SELECT insert_resource(_resource_storage_id, _resource_quantity) INTO _resource_id;
+        SELECT insert_family_resource_ownership(_family_id, _resource_id);
+        COMMIT;
     END;
 $$ LANGUAGE plpgsql;

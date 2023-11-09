@@ -141,6 +141,13 @@ CREATE TABLE IF NOT Exists Position
     PRIMARY KEY (id)
 );
 
+CREATE TABLE IF NOT EXISTS Position_craft_type_relation
+(
+    position_id integer REFERENCES Position (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    craft_type_id integer REFERENCES Craft_type (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (position_id, craft_type_id)
+);
+
 CREATE TABLE IF NOT EXISTS Person_position_history
 (
     id             SERIAL,

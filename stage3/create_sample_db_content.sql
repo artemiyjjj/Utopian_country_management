@@ -3,6 +3,7 @@ SELECT insert_craft_type('Farming');
 SELECT insert_craft_type('Livestock');
 SELECT insert_craft_type('Copper');
 SELECT insert_craft_type('Factory worker');
+SELECT insert_craft_type('Teaching');
 
 SELECT insert_political_status('In state of war');
 SELECT insert_political_status('In state of conflict');
@@ -20,6 +21,10 @@ SELECT insert_position('Filarch');
 SELECT insert_position('Protofilarch');
 SELECT insert_position('Duke');
 SELECT insert_position('Craftsman');
+SELECT insert_position('Kniaz');
+SELECT insert_position('Foreign king');
+SELECT insert_position('Foreign diplomat');
+SELECT insert_position('Foreign citizen');
 
 SELECT insert_resource_type('Water');
 SELECT insert_resource_type('Wood');
@@ -41,21 +46,60 @@ SELECT insert_person('Person 1254');
 SELECT insert_person('Sigizmund IV');
 SELECT insert_person('EKATERINA I');
 
+SELECT insert_person_position_history('Sigizmund III', 'Foreign king', '22.10.2000');
+SELECT insert_person_position_history('Sigizmund IV', 'Foreign diplomat', '05.03.2001');
+SELECT insert_person_position_history('Petr I', 'Foreign king', '30.05.1998');
+SELECT insert_person_position_history('EKATERINA I', 'Foreign diplomat', '30.05.1998');
+SELECT insert_person_position_history('The Queen', 'Foreign king', '17.04.2002');
+SELECT insert_person_position_history('Person 1254', 'kniaz', '20.08.2000');
+
 SELECT insert_country('Utopia', 'Person 1254');
 SELECT insert_country('Poland', 'Sigizmund III');
 SELECT insert_country('Finland', 'Petr I');
 SELECT insert_country('Sweden');
 
-SELECT update_country('Poland', 'Sigizmund IV');
-SELECT update_country('Finland', 'EKATERINA I');
+-- SELECT update_country('Poland', 'Sigizmund IV');
+SELECT update_country('Sweden', 'The Queen');
 
 SELECT insert_person('Ivan Semenich', 'Poland');
 SELECT insert_person('Person 5347', 'Utopia');
 SELECT insert_person('Person 4499', 'Utopia');
 SELECT insert_person('Person 400', 'Utopia');
+SELECT insert_person('Alex Mayhem', 'Utopia');
+SELECT insert_person('Kirill Abvgd', 'Utopia');
+SELECT insert_person('Kopatich', 'Utopia');
+SELECT insert_person('Mr. Undwick', 'Utopia');
+SELECT insert_person('Anton Mirniy', 'Utopia');
+SELECT insert_person('Evgeniy Krivchov', 'Utopia');
 
-SELECT insert_family('Farming');
-SELECT insert_family('Copper', [(Select id from person where name = 'Person 5347'), get_person_id_by_name('Person 4499')]);
+
+
+SELECT insert_family('Farming', [
+    get_person_id_by_name('Kopatich')
+    ]);
+
+SELECT insert_family('Copper',
+    [get_person_id_by_name('Person 5347'),
+    get_person_id_by_name('Person 4499')
+    ]);
+
+SELECT insert_family('Livestock', [
+    get_person_id_by_name('Alex Mayhem'),
+    get_person_id_by_name('Anton Mirniy')
+    ]);
+
+SELECT insert_family('Teaching', [
+    get_person_id_by_name('Mr. Undwick'),
+    get_person_id_by_name('Person 400')
+    ]);
+
+SELECT insert_family('Factory worker', [
+    get_person_id_by_name('Kirill Abvgd')
+    ]);
+SELECT insert_family('Copper', [
+    get_person_id_by_name('Evgeniy Krivchov')
+    ]);
+
 
 SELECT insert_event_group('Antanta');
 SELECT insert_event_group('Bechennie');
@@ -78,11 +122,5 @@ SELECT insert_relationship_events_groups((Select id from country_relationship_ev
 SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = '08.11.2023'), 'Ne pri delah');
 
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.2);
-
-
--- SELECT get_country_id_by_name('df');
-
-
-SELECT insert_person('Karl V', 'German')
-
-SELECT insert_family()
+SELECT get_or_insert_resource_usage_type_id_by_amount(0.5);
+SELECT get_or_insert_resource_usage_type_id_by_amount(50);

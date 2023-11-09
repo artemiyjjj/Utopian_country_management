@@ -165,7 +165,7 @@ $$
     INSERT INTO event_group (name) VALUES (group_name) RETURNING id;
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_event_group_countries (group_name text, country_name text) RETURNS event_group_countries AS
+CREATE OR REPLACE FUNCTION insert_event_group_countries (group_name text, country_name text) RETURNS void AS
 $$
     DECLARE
         group_id_val integer;
@@ -176,10 +176,10 @@ $$
         IF group_id_val IS NOT NULL and country_id_val IS NOT NULL
             THEN
                 INSERT INTO event_group_countries (group_id, country_id)
-                VALUES (group_id_val, country_id_val)
-                RETURNING (group_id, country_id);
+                VALUES (group_id_val, country_id_val);
+--                 RETURNING *;
         end if;
-    RETURN (group_id, country_id);
+        RETURN;
     end;
 $$ LANGUAGE plpgsql;
 
@@ -209,6 +209,7 @@ $$
                 VALUES (political_status_id_val, event_start_date)
                 RETURNING id;
         end if;
+        RETURN *;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -307,7 +308,7 @@ $$
     RETURNING id;
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_resource_usage (resource_id_val integer, resource_usage_type_amount double precision) RETURNS resource_usage AS
+CREATE OR REPLACE FUNCTION insert_resource_usage (resource_id_val integer, resource_usage_type_amount double precision) RETURNS integer AS
 $$
     DECLARE
         resource_usage_type_id_val integer;
@@ -317,26 +318,26 @@ $$
             THEN
                 INSERT INTO resource_usage (resource_id, resource_usage_type_id)
                 VALUES (resource_id_val, resource_usage_type_id_val)
-                RETURNING (id, resource_id, resource_usage_type_id);
+                RETURNING (id);
         END IF;
     END;
 $$ LANGUAGE plpgsql;
 
 
 
-CREATE OR REPLACE FUNCTION insert_craft_type (craft_type_name text) RETURNS craft_type AS
+CREATE OR REPLACE FUNCTION insert_craft_type (craft_type_name text) RETURNS integer AS
 $$
-    INSERT INTO Craft_type (craft_name) VALUES (craft_type_name) RETURNING (id, craft_name);
+    INSERT INTO Craft_type (craft_name) VALUES (craft_type_name) RETURNING (id);
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_family(craft_type_name text) RETURNS family AS
+CREATE OR REPLACE FUNCTION insert_family(craft_type_name text) RETURNS integer AS
 $$
     INSERT INTO Family (craft_type_id)
     VALUES
-        (get_craft_type_id_id_by_name(craft_type_name)) RETURNING (family.id, family.craft_type_id);
+        (get_craft_type_id_id_by_name(craft_type_name)) RETURNING (id);
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_family(craft_type_name text, VARIADIC person_id integer[]) RETURNS family AS
+CREATE OR REPLACE FUNCTION insert_family(craft_type_name text, VARIADIC person_id integer[]) RETURNS integer AS
 $$
     DECLARE
         new_family_id integer;
@@ -344,8 +345,9 @@ $$
     BEGIN
     SELECT insert_family(craft_type_name) INTO new_family_id;
     FOREACH p_id IN ARRAY person_id LOOP
-        SELECT update_person(p_id, new_family_id);
+        PERFORM update_person(p_id, new_family_id);
         END LOOP;
+    RETURN new_family_id;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -436,6 +438,14 @@ $$
     RETURNING (id, name, motherland_id, family_id);
 $$ language sql;
 
+CREATE OR REPLACE FUNCTION update_person (_person_id integer, _new_family_id integer) RETURNS person AS
+$$
+    UPDATE person
+    SET family_id = _new_family_id
+    WHERE id = _person_id
+    RETURNING (id, name, motherland_id, family_id);
+$$ language sql;
+
 -- CREATE OR REPLACE FUNCTION update_person (person_id integer, new_family_id integer) RETURNS person AS
 -- $$
 --     BEGIN
@@ -455,6 +465,14 @@ $$
     UPDATE person
     SET family_id = _new_family_id
     WHERE name = _name
+    RETURNING (id, name, motherland_id, family_id);
+$$ language sql;
+
+CREATE OR REPLACE FUNCTION update_person (_person_id integer, _new_family_id integer) RETURNS person AS
+$$
+    UPDATE person
+    SET family_id = _new_family_id
+    WHERE id = _person_id
     RETURNING (id, name, motherland_id, family_id);
 $$ language sql;
 

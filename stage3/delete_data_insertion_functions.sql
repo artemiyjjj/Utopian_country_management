@@ -91,7 +91,11 @@ DROP FUNCTION IF EXISTS insert_person (_name text, _motherland_name text, _famil
 
 DROP FUNCTION IF EXISTS update_person(_name text, _motherland_name text) CASCADE;
 
+DROP FUNCTION IF EXISTS update_person(_person_id integer, _motherland_name text) CASCADE;
+
 DROP FUNCTION IF EXISTS update_person (_name text, _new_family_id integer) CASCADE;
+
+DROP FUNCTION IF EXISTS update_person (_person_id integer, _new_family_id integer) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_position (position_name text) CASCADE;
 

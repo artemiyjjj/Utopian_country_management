@@ -58,7 +58,7 @@ SELECT insert_country('Poland', 'Sigizmund III');
 SELECT insert_country('Finland', 'Petr I');
 SELECT insert_country('Sweden');
 
-SELECT update_country('Poland', 'Sigizmund IV');
+-- SELECT update_country('Poland', 'Sigizmund IV');
 -- SELECT update_country('Sweden', 'The Queen');
 
 SELECT insert_person('Ivan Semenich', 'Poland');
@@ -76,31 +76,32 @@ SELECT insert_person('Evgeniy Krivchov', 'Utopia');
 --     get_person_id_by_name('Kopatich')
 --     ]);
 
-SELECT insert_family('Farming', ARRAY [
+SELECT insert_family('Farming', VARIADIC ARRAY[
     ( SELECT id from person where name = 'Kopatich')
-    ]);
+    ]::integer[]);
 
-SELECT insert_family('Copper', [
+SELECT insert_family('Copper', VARIADIC ARRAY [
     get_person_id_by_name('Person 5347'),
     get_person_id_by_name('Person 4499')
     ]);
 
-SELECT insert_family('Livestock', ARRAY [
+SELECT insert_family('Livestock', VARIADIC ARRAY [
     get_person_id_by_name('Alex Mayhem'),
     get_person_id_by_name('Anton Mirniy')
     ]);
 
-SELECT insert_family('Teaching', ARRAY [
+SELECT insert_family('Teaching', VARIADIC ARRAY [
     get_person_id_by_name('Mr. Undwick'),
     get_person_id_by_name('Person 400')
     ]);
 
-SELECT insert_family('Factory worker', ARRAY [
+SELECT insert_family('Factory worker', VARIADIC ARRAY [
     get_person_id_by_name('Kirill Abvgd')
     ]);
--- SELECT insert_family('Copper', {
---     get_person_id_by_name('Evgeniy Krivchov')
---            });
+
+SELECT insert_family('Copper', VARIADIC ARRAY[
+    get_person_id_by_name('Evgeniy Krivchov')
+           ]);
 
 
 SELECT insert_event_group('Antanta');
@@ -115,13 +116,12 @@ SELECT insert_event_group_countries('Bechennie', 'Poland');
 SELECT insert_event_group_countries('Crutie', 'Finland');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
 
-SELECT insert_country_relationship_event('In state of war', '08.11.2020', ['Antanta', 'Bechennie']);
-SELECT insert_country_relationship_event('Peaceful state', '08.11.2023');
-SELECT insert_country_relationship_event('In state of conflict', '15.08.2015', ['Crutie', 'Ne pri delah']);
--- SELECT id FROM country_relationship_event_history where start_event_date = '08.11.2020';
+SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8), Variadic array['Antanta', 'Bechennie']);
+SELECT insert_country_relationship_event('Peaceful state', make_date(2023, 11, 8));
+SELECT insert_country_relationship_event('In state of conflict', make_date(2015, 11, 8), VARIADIC ARRAY['Crutie', 'Ne pri delah']);
 
-SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = '08.11.2023'), 'Crutie');
-SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = '08.11.2023'), 'Ne pri delah');
+SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Crutie');
+SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Ne pri delah');
 
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.2);
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.5);

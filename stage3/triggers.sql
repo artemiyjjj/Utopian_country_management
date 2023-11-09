@@ -100,10 +100,9 @@ $$
     BEGIN
         SELECT get_resource_type_id_by_name(_resource_type_name) INTO _resource_type_id;
         SELECT id FROM resource_storage where resource_type_id = _resource_type_id and current_quantity >= _resource_quantity INTO _resource_storage_id;
-        UPDATE resource_storage SET current_quantity = current_quantity - _resource_quantity
-        WHERE id = _resource_storage_id;
+        UPDATE resource_storage SET current_quantity = current_quantity - _resource_quantity WHERE id = _resource_storage_id;
         SELECT insert_resource(_resource_storage_id, _resource_quantity) INTO _resource_id;
-        SELECT insert_family_resource_ownership(_family_id, _resource_id);
+        PERFORM insert_family_resource_ownership(_family_id, _resource_id);
         COMMIT;
     END;
 $$ LANGUAGE plpgsql;

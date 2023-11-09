@@ -116,7 +116,7 @@ SELECT insert_event_group_countries('Bechennie', 'Poland');
 SELECT insert_event_group_countries('Crutie', 'Finland');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
 
-SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8), Variadic array['Antanta', 'Bechennie']);
+SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8), Variadic ARRAY['Antanta', 'Bechennie']::text[]);
 SELECT insert_country_relationship_event('Peaceful state', make_date(2023, 11, 8));
 SELECT insert_country_relationship_event('In state of conflict', make_date(2015, 11, 8), VARIADIC ARRAY['Crutie', 'Ne pri delah']);
 

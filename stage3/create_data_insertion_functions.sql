@@ -183,17 +183,17 @@ $$
     end;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_relationship_events_groups (event_id integer, group_name text) RETURNS event_groups AS
+CREATE OR REPLACE FUNCTION insert_relationship_events_groups (event_id integer, group_name text) RETURNS void AS
 $$
     DECLARE
         group_id integer;
     BEGIN
         SELECT get_event_group_id_by_name(group_name) INTO group_id;
-        IF event_group_id IS NOT NULL and is_country_relationship_event_exists(event_id)
+        IF group_id IS NOT NULL and is_country_relationship_event_exists(event_id)
             THEN
-                INSERT INTO event_groups (id, event_group_id) VALUES (event_id, group_id)
-                RETURNING (id, event_group_id);
+                INSERT INTO event_groups (id, event_group_id) VALUES (event_id, group_id);
         END IF;
+    RETURN;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -201,15 +201,16 @@ CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_n
 $$
     DECLARE
         political_status_id_val integer;
+        new_event_id integer;
     BEGIN
         SELECT get_political_status_id_by_name(political_status_name) INTO political_status_id_val;
         IF political_status_id_val IS NOT NULL
             THEN
                 INSERT INTO country_relationship_event_history (political_status_id, start_event_date)
                 VALUES (political_status_id_val, event_start_date)
-                RETURNING id;
+                RETURNING id INTO new_event_id;
         end if;
-        RETURN *;
+        RETURN new_event_id;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -238,7 +239,7 @@ $$
         IF country_relationship_event_id IS NOT NULL
             THEN
                 FOREACH group_name IN ARRAY event_groups_name_set LOOP
-                    SELECT insert_relationship_events_groups(country_relationship_event_id, group_name);
+                    PERFORM insert_relationship_events_groups(country_relationship_event_id, group_name);
                 END LOOP;
         END IF;
         RETURN country_relationship_event_id;

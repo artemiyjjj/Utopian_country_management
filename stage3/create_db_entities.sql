@@ -70,7 +70,9 @@ CREATE TABLE IF NOT EXISTS Resource_storage
     id               SERIAL,
     resource_type_id integer REFERENCES Resource_type (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     total_quantity   double precision NOT NULL
-        CONSTRAINT is_countable CHECK ( total_quantity >= 0 ),
+        CONSTRAINT is_total_countable CHECK ( total_quantity >= 0 ),
+    current_quantity double precision NOT NULL
+        CONSTRAINT is_current_countable CHECK ( current_quantity >= 0),
     PRIMARY KEY (id)
 );
 
@@ -117,8 +119,6 @@ CREATE TABLE IF NOT EXISTS Family_resource_ownership
 (
     family_id   integer REFERENCES Family (id) On UPDATE CASCADE ON DELETE CASCADE,
     resource_id integer REFERENCES Resource (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    quantity    double precision NOT NULL
-        CONSTRAINT is_countable CHECK ( quantity >= 0 ),
     PRIMARY KEY (family_id, resource_id)
 );
 

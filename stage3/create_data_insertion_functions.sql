@@ -274,26 +274,26 @@ $$
     RETURNING id;
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_resource_storage (resource_type_name text, resource_storage_quantity double precision) RETURNS integer AS
-$$
-    DECLARE
-        resource_type_id_val integer;
-    BEGIN
-        SELECT get_resource_type_id_by_name(resource_type_name) INTO resource_type_id_val;
-        IF resource_type_name IS NOT NULL and resource_storage_quantity >= 0
-            THEN
-                INSERT INTO resource_storage (resource_type_id, total_quantity)
-                VALUES (resource_type_id_val, resource_storage_quantity)
-                RETURNING id;
-        END IF;
-    END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION insert_resource_storage (resource_type_name text, resource_storage_quantity double precision, resource_storage_current_quantity double precision) RETURNS integer AS
+-- $$
+--     DECLARE
+--         resource_type_id_val integer;
+--     BEGIN
+--         SELECT get_resource_type_id_by_name(resource_type_name) INTO resource_type_id_val;
+--         IF resource_type_name IS NOT NULL and resource_storage_quantity >= 0 and resource_storage_current_quantity >= 0 and resource_storage_current_quantity <= resource_storage_quantity
+--             THEN
+--                 INSERT INTO resource_storage (resource_type_id, total_quantity, current_quantity)
+--                 VALUES (resource_type_id_val, resource_storage_quantity, resource_storage_current_quantity)
+--                 RETURNING id;
+--         END IF;
+--     END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION _insert_resource_storage (_resource_type_name text, _resource_storage_quantity double precision) RETURNS integer AS
+CREATE OR REPLACE FUNCTION _insert_resource_storage (_resource_type_name text, _resource_storage_quantity double precision, _resource_storage_current_quantity double precision) RETURNS integer AS
     $$
 
-        INSERT INTO resource_storage (resource_type_id, total_quantity)
-        VALUES ((SELECT id FROM resource_type WHERE resource_type = _resource_type_name), _resource_storage_quantity )
+        INSERT INTO resource_storage (resource_type_id, total_quantity, current_quantity)
+        VALUES ((SELECT id FROM resource_type WHERE resource_type = _resource_type_name), _resource_storage_quantity, _resource_storage_current_quantity )
         RETURNING id;
     $$ language sql;
 
@@ -358,14 +358,14 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_family_resource_ownership (family_id_val integer, resource_id_val integer, resource_quantity double precision) RETURNS family_resource_ownership AS
+CREATE OR REPLACE FUNCTION insert_family_resource_ownership (family_id_val integer, resource_id_val integer) RETURNS family_resource_ownership AS
 $$
     BEGIN
-        IF is_family_exists(family_id_val) and is_resource_exists(resource_id_val) and resource_quantity >= 0
+        IF is_family_exists(family_id_val) and is_resource_exists(resource_id_val)
             THEN
-                INSERT INTO family_resource_ownership (family_id, resource_id, quantity)
-                VALUES (family_id_val, resource_id_val, resource_quantity)
-                RETURNING (family_id, resource_id, quantity);
+                INSERT INTO family_resource_ownership (family_id, resource_id)
+                VALUES (family_id_val, resource_id_val)
+                RETURNING (family_id, resource_id);
         END IF;
     END;
 $$ LANGUAGE plpgsql;
@@ -393,7 +393,7 @@ $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION insert_person (_name text, _motherland_name text) RETURNS integer AS
 $$
-    INSERT INTO person (name, motherland_id) VALUES (_name, _motherland_name) RETURNING (id);
+    INSERT INTO person (name, motherland_id) VALUES (_name, get_country_id_by_name(_motherland_name)) RETURNING (id);
 $$ language sql;
 
 -- CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text, some_family_id integer) RETURNS person AS
@@ -417,7 +417,7 @@ $$ language sql;
 
 CREATE OR REPLACE FUNCTION insert_person (_name text, _motherland_name text, _family_id integer) RETURNS integer AS
 $$
-    INSERT INTO person (name, motherland_id, family_id) VALUES (_name, _motherland_name, _family_id) RETURNING (id);
+    INSERT INTO person (name, motherland_id, family_id) VALUES (_name, get_country_id_by_name(_motherland_name), _family_id) RETURNING (id);
 $$ language sql;
 
 -- CREATE OR REPLACE FUNCTION update_person (person_name text, new_motherland_name text) RETURNS person AS

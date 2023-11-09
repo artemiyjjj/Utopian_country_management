@@ -77,13 +77,13 @@ DROP FUNCTION IF EXISTS insert_family_resource_ownership (family_id_val integer,
 
 DROP FUNCTION IF EXISTS insert_person(person_name text) CASCADE;
 
-DROP FUNCTION IF EXISTS insert_person(person_name text, motherland_name text) CASCADE;
+DROP FUNCTION IF EXISTS insert_person(_name text, _motherland_name text) CASCADE;
 
-DROP FUNCTION IF EXISTS insert_person(person_name text, motherland_name text, some_family_id integer) CASCADE;
+DROP FUNCTION IF EXISTS insert_person (_name text, _motherland_name text, _family_id integer) CASCADE;
 
-DROP FUNCTION IF EXISTS update_person(person_name text, new_motherland_name text) CASCADE;
+DROP FUNCTION IF EXISTS update_person(_name text, _motherland_name text) CASCADE;
 
-DROP FUNCTION IF EXISTS update_person(person_id integer, new_family_id integer) CASCADE;
+DROP FUNCTION IF EXISTS update_person (_name text, _new_family_id text) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_position (position_name text) CASCADE;
 

@@ -125,20 +125,26 @@ $$
     INSERT INTO Country (name) VALUES (country_name) RETURNING (country.id);
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_country(country_name text, leader_name text) RETURNS integer AS
+-- CREATE OR REPLACE FUNCTION insert_country(country_name text, leader_name text) RETURNS integer AS
+-- $$
+--     DECLARE
+--         country_leader_id integer;
+--     BEGIN
+--         SELECT get_person_id_by_name(leader_name) INTO country_leader_id;
+--         IF country_leader_id IS NOT NULL
+--             THEN
+--                 INSERT INTO country (name, leader_id) VALUES (country_name, country_leader_id)
+--                 RETURNING (id);
+-- --             ELSE RAISE EXCEPTION 'Person with name % does not exists.', leader_name;
+--         END IF;
+--     END;
+-- $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_country (country_name text, leader_name text) RETURNS integer AS
 $$
-    DECLARE
-        country_leader_id integer;
-    BEGIN
-        SELECT get_person_id_by_name(leader_name) INTO country_leader_id;
-        IF country_leader_id IS NOT NULL
-            THEN
-                INSERT INTO Country (name, leader_id) VALUES (country_name, country_leader_id)
-                RETURNING country.id;
-            ELSE RAISE EXCEPTION 'Person with name % does not exists.', leader_name;
-        END IF;
-    END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO country (name, leader_id) VALUES (country_name, get_person_id_by_name(leader_name))
+    RETURNING id;
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION update_country (country_name text, leader_name text) RETURNS country AS
 $$
@@ -302,6 +308,8 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
+
+
 CREATE OR REPLACE FUNCTION insert_resource_usage_type (resource_usage_type_amount double precision) RETURNS integer AS
 $$
     INSERT INTO resource_usage_type (amount) VALUES (resource_usage_type_amount)
@@ -369,78 +377,121 @@ $$
     INSERT INTO Person (name) VALUES (person_name) RETURNING id;
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text) RETURNS person AS
-$$
-    DECLARE
-        country_id integer;
-    BEGIN
-        SELECT get_country_id_by_name(motherland_name) INTO country_id;
-        INSERT INTO Person (name, motherland_id) VALUES (person_name, country_id)
-        RETURNING (person.id, person.name, person.motherland_id);
+-- CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text) RETURNS integer AS
+-- $$
+--     DECLARE
+--         country_id integer;
+--     BEGIN
+--         SELECT get_country_id_by_name(motherland_name) INTO country_id;
+--         INSERT INTO Person (name, motherland_id) VALUES (person_name, country_id)
+--         RETURNING person.id;
+--
+-- --         EXCEPTION
+-- --             WHEN no_data_found THEN RAISE EXCEPTION 'Country % was not found.', motherland_name;
+--     END;
+-- $$ LANGUAGE plpgsql;
 
-        EXCEPTION
-            WHEN no_data_found THEN RAISE EXCEPTION 'Country % was not found.', motherland_name;
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text, some_family_id integer) RETURNS person AS
+CREATE OR REPLACE FUNCTION insert_person (_name text, _motherland_name text) RETURNS integer AS
 $$
-    DECLARE
-        country_id integer;
-    BEGIN
-        SELECT get_country_id_by_name (motherland_name) INTO country_id;
-        IF NOT is_family_exists(some_family_id)
-            THEN RAISE EXCEPTION 'Family with id % does not exists', some_family_id;
-        ELSIF country_id IS NULL
-            THEN RAISE EXCEPTION 'Country with name % does not exists', motherland_name;
-        ELSE
-            INSERT INTO Person (name, motherland_id, family_id)
-            VALUES
-                (person_name, country_id, some_family_id)
-            RETURNING person.id, person.name, person.motherland_id, person.family_id;
-        END IF;
-    END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO person (name, motherland_id) VALUES (_name, _motherland_name) RETURNING (id);
+$$ language sql;
 
-CREATE OR REPLACE FUNCTION update_person (person_name text, new_motherland_name text) RETURNS person AS
-$$
-    DECLARE
-        new_motherland_id integer;
-    BEGIN
-        SELECT get_country_id_by_name(new_motherland_name) INTO new_motherland_id;
-        IF new_motherland_id IS NOT NULL
-            THEN
-                UPDATE person
-                    SET motherland_id = new_motherland_id
-                    WHERE name = person_name
-                RETURNING (person.id, person.name, person.family_id, person.motherland_id);
-            ELSE RAISE EXCEPTION 'Country with name % does not exists', new_motherland_name;
-        END IF;
-    END;
-$$ Language plpgsql;
+-- CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text, some_family_id integer) RETURNS person AS
+-- $$
+--     DECLARE
+--         country_id integer;
+--     BEGIN
+--         SELECT get_country_id_by_name (motherland_name) INTO country_id;
+--         IF NOT is_family_exists(some_family_id)
+--             THEN RAISE EXCEPTION 'Family with id % does not exists', some_family_id;
+--         ELSIF country_id IS NULL
+--             THEN RAISE EXCEPTION 'Country with name % does not exists', motherland_name;
+--         ELSE
+--             INSERT INTO Person (name, motherland_id, family_id)
+--             VALUES
+--                 (person_name, country_id, some_family_id)
+--             RETURNING person.id, person.name, person.motherland_id, person.family_id;
+--         END IF;
+--     END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION update_person (person_id integer, new_family_id integer) RETURNS person AS
+CREATE OR REPLACE FUNCTION insert_person (_name text, _motherland_name text, _family_id integer) RETURNS integer AS
 $$
-    BEGIN
-        IF is_family_exists(new_family_id)
-            THEN
-                UPDATE person
-                    SET family_id = new_family_id
-                    WHERE id = person_id
-                RETURNING (person.id, person.name, person.family_id, person.motherland_id);
-            ELSE RAISE EXCEPTION 'Family with id % does not exists', new_family_id;
-        END IF;
-    END;
-$$ Language plpgsql;
+    INSERT INTO person (name, motherland_id, family_id) VALUES (_name, _motherland_name, _family_id) RETURNING (id);
+$$ language sql;
+
+-- CREATE OR REPLACE FUNCTION update_person (person_name text, new_motherland_name text) RETURNS person AS
+-- $$
+--     DECLARE
+--         new_motherland_id integer;
+--     BEGIN
+--         SELECT get_country_id_by_name(new_motherland_name) INTO new_motherland_id;
+--         IF new_motherland_id IS NOT NULL
+--             THEN
+--                 UPDATE person
+--                     SET motherland_id = new_motherland_id
+--                     WHERE name = person_name
+--                 RETURNING (person.id, person.name, person.family_id, person.motherland_id);
+--             ELSE RAISE EXCEPTION 'Country with name % does not exists', new_motherland_name;
+--         END IF;
+--     END;
+-- $$ Language plpgsql;
+
+CREATE OR REPLACE FUNCTION update_person (_name text, _motherland_name text) RETURNS person AS
+$$
+    UPDATE person
+    SET motherland_id = get_country_id_by_name(_motherland_name)
+    WHERE name = _name
+    RETURNING (id, name, motherland_id, family_id);
+$$ language sql;
+
+-- CREATE OR REPLACE FUNCTION update_person (person_id integer, new_family_id integer) RETURNS person AS
+-- $$
+--     BEGIN
+--         IF is_family_exists(new_family_id)
+--             THEN
+--                 UPDATE person
+--                     SET family_id = new_family_id
+--                     WHERE id = person_id
+--                 RETURNING (person.id, person.name, person.family_id, person.motherland_id);
+--             ELSE RAISE EXCEPTION 'Family with id % does not exists', new_family_id;
+--         END IF;
+--     END;
+-- $$ Language plpgsql;
+
+CREATE OR REPLACE FUNCTION update_person (_name text, _new_family_id text) RETURNS person AS
+$$
+    UPDATE person
+    SET family_id = _new_family_id
+    WHERE name = _name
+    RETURNING (id, name, motherland_id, family_id);
+$$ language sql;
 
 CREATE OR REPLACE FUNCTION insert_position (position_name text) RETURNS integer AS
 $$
     INSERT INTO Position (name) VALUES (position_name) RETURNING (position.id);
 $$ LANGUAGE sql;
 
+CREATE OR REPLACE FUNCTION insert_position_craft_type_relation (position_name text, craft_type_name text) RETURNS position_craft_type_relation AS
+$$
+    DECLARE
+        _position_id integer;
+        _craft_type_id integer;
+    BEGIN
+        SELECT get_position_id_by_name(position_name) INTO _position_id;
+        SELECT get_position_id_by_name(craft_type_name) INTO _craft_type_id;
+        IF _position_id IS NOT NULL and _craft_type_id IS NOT NULL
+            THEN
+                INSERT INTO position_craft_type_relation (position_id, craft_type_id)
+                VALUES (_position_id, _craft_type_id)
+                RETURNING (position_id, craft_type_id);
+        ELSE RAISE EXCEPTION 'Position or craft_type does not exists.';
+        end if;
+    END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _date date ) RETURNS integer AS
     $$
-
         INSERT INTO person_position_history (person_id, position_id, hire_date)
         VALUES ((SELECT id FROM person WHERE name = _person), (SELECT id FROM Position WHERE name = _position), _date )
         RETURNING id;
@@ -448,7 +499,6 @@ CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position tex
 
 CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _hire_date date, _dismissal_date date ) RETURNS integer AS
     $$
-
         INSERT INTO person_position_history (person_id, position_id, hire_date, dismissal_date)
         VALUES ((SELECT id FROM person WHERE name = _person), (SELECT id FROM Position WHERE name = _position), _hire_date, _dismissal_date )
         RETURNING id;
@@ -469,9 +519,9 @@ $$
                 RETURNING id;
         ELSE
             RAISE EXCEPTION 'Wrong inputs.';
-            Return null;
-        END iF;
-    END;
+Return null;
+END iF;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_person_position_history (person_position_history_id integer, person_dismissal_date date) RETURNS person_position_history AS

@@ -51,7 +51,7 @@ SELECT _insert_position_history('Sigizmund IV', 'Foreign diplomat', make_date(20
 SELECT _insert_position_history('Petr I', 'Foreign king', make_date(1998, 5, 30));
 SELECT _insert_position_history('EKATERINA I', 'Foreign diplomat', make_date(1998, 5, 30));
 SELECT _insert_position_history('The Queen', 'Foreign king', make_date(2002, 4, 17));
-SELECT _insert_position_history('Person 1254', 'kniaz', make_date(2000, 4, 17));
+SELECT _insert_position_history('Person 1254', 'Kniaz', make_date(2000, 4, 17));
 
 SELECT insert_country('Utopia', 'Person 1254');
 SELECT insert_country('Poland', 'Sigizmund III');

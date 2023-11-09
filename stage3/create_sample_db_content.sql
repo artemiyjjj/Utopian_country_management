@@ -72,7 +72,7 @@ SELECT insert_person('Mr. Undwick', 'Utopia');
 SELECT insert_person('Anton Mirniy', 'Utopia');
 SELECT insert_person('Evgeniy Krivchov', 'Utopia');
 
-SELECT insert_family('Farming', [
+SELECT insert_family('Farming', ARRAY [
     get_person_id_by_name('Kopatich')
     ]);
 
@@ -81,17 +81,17 @@ SELECT insert_family('Copper',
     get_person_id_by_name('Person 4499')
     ]);
 
-SELECT insert_family('Livestock', [
+SELECT insert_family('Livestock', ARRAY [
     get_person_id_by_name('Alex Mayhem'),
     get_person_id_by_name('Anton Mirniy')
     ]);
 
-SELECT insert_family('Teaching', [
+SELECT insert_family('Teaching', ARRAY [
     get_person_id_by_name('Mr. Undwick'),
     get_person_id_by_name('Person 400')
     ]);
 
-SELECT insert_family('Factory worker', [
+SELECT insert_family('Factory worker', ARRAY [
     get_person_id_by_name('Kirill Abvgd')
     ]);
 -- SELECT insert_family('Copper', {

@@ -1,31 +1,20 @@
 CREATE OR REPLACE FUNCTION get_country_id_by_name(country_name text) RETURNS integer AS
 $$
-    BEGIN
     SELECT id FROM Country WHERE name = country_name;
-
-    EXCEPTION
-        WHEN no_data_found THEN RAISE EXCEPTION 'No country with name %.', country_name;
-    END;
-$$ LANGUAGE plpgsql;
+$$ STABLE LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION get_event_group_id_by_name(event_group_name text) RETURNS integer AS
 $$
-    BEGIN
     SELECT id FROM event_group WHERE name = event_group_name;
-
-    EXCEPTION
-        WHEN no_data_found THEN RAISE EXCEPTION 'No event group with name %.', event_group_name;
-    END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION get_political_status_id_by_name (political_status_name text) RETURNS integer AS
 $$
-    BEGIN
     SELECT id FROM political_status WHERE name = political_status_name;
-    EXCEPTION
-        WHEN no_data_found THEN RAISE EXCEPTION 'No political status type with name % found.', political_status_name;
-    END;
-$$ LANGUAGE plpgsql;
+--     EXCEPTION
+--         WHEN no_data_found THEN RAISE EXCEPTION 'No political status type with name % found.', political_status_name;
+--     END;
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION get_position_id_by_name (position_name text) RETURNS integer AS
 $$
@@ -393,7 +382,7 @@ $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION insert_person (_name text, _motherland_name text) RETURNS integer AS
 $$
-    INSERT INTO person (name, motherland_id) VALUES (_name, get_country_id_by_name(_motherland_name)) RETURNING (id);
+    INSERT INTO person (name, motherland_id) VALUES (_name, (SELECT get_country_id_by_name(_motherland_name))) RETURNING (id);
 $$ language sql;
 
 -- CREATE OR REPLACE FUNCTION insert_person (person_name text, motherland_name text, some_family_id integer) RETURNS person AS

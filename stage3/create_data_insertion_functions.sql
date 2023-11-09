@@ -52,7 +52,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION get_building_type_id_by_name (building_type_name text) RETURNS integer AS
 $$
     BEGIN
-    SELECT id FROM Building_type WHERE type_name = building_type_name;
+    RETURN (SELECT id FROM Building_type WHERE type_name = building_type_name);
     EXCEPTION
         WHEN no_data_found THEN RAISE EXCEPTION 'No building type with name % found.', building_type_name;
     END;
@@ -135,7 +135,7 @@ $$
     RETURNING id;
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION update_country (country_name text, leader_name text) RETURNS country AS
+CREATE OR REPLACE FUNCTION update_country (country_name text, leader_name text) RETURNS void AS
 $$
     DECLARE
         country_id integer;
@@ -147,9 +147,10 @@ $$
             THEN
                 UPDATE country
                     SET leader_id = person_leader_id
-                    WHERE id = country_id
-                RETURNING (id, name, leader_id);
+                    WHERE id = country_id;
+--                 RETURNING *;
         end if;
+        RETURN;
     end;
 $$ LANGUAGE plpgsql;
 
@@ -178,6 +179,7 @@ $$
                 VALUES (group_id_val, country_id_val)
                 RETURNING (group_id, country_id);
         end if;
+    RETURN (group_id, country_id);
     end;
 $$ LANGUAGE plpgsql;
 

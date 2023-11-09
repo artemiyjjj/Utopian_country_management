@@ -58,7 +58,7 @@ SELECT insert_country('Poland', 'Sigizmund III');
 SELECT insert_country('Finland', 'Petr I');
 SELECT insert_country('Sweden');
 
--- SELECT update_country('Poland', 'Sigizmund IV');
+SELECT update_country('Poland', 'Sigizmund IV');
 -- SELECT update_country('Sweden', 'The Queen');
 
 SELECT insert_person('Ivan Semenich', 'Poland');
@@ -72,12 +72,16 @@ SELECT insert_person('Mr. Undwick', 'Utopia');
 SELECT insert_person('Anton Mirniy', 'Utopia');
 SELECT insert_person('Evgeniy Krivchov', 'Utopia');
 
+-- SELECT insert_family('Farming', ARRAY [
+--     get_person_id_by_name('Kopatich')
+--     ]);
+
 SELECT insert_family('Farming', ARRAY [
-    get_person_id_by_name('Kopatich')
+    ( SELECT id from person where name = 'Kopatich')
     ]);
 
-SELECT insert_family('Copper',
-    [get_person_id_by_name('Person 5347'),
+SELECT insert_family('Copper', [
+    get_person_id_by_name('Person 5347'),
     get_person_id_by_name('Person 4499')
     ]);
 

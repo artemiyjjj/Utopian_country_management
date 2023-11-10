@@ -482,23 +482,29 @@ $$
     INSERT INTO Position (name) VALUES (position_name) RETURNING (position.id);
 $$ LANGUAGE sql;
 
-CREATE OR REPLACE FUNCTION insert_position_craft_type_relation (position_name text, craft_type_name text) RETURNS position_craft_type_relation AS
+-- CREATE OR REPLACE FUNCTION insert_position_craft_type_relation (position_name text, craft_type_name text) RETURNS void AS
+-- $$
+--     DECLARE
+--         _position_id integer;
+--         _craft_type_id integer;
+--     BEGIN
+--         SELECT get_position_id_by_name(position_name) INTO _position_id;
+--         SELECT get_position_id_by_name(craft_type_name) INTO _craft_type_id;
+--         IF _position_id IS NOT NULL and _craft_type_id IS NOT NULL
+--             THEN
+--                 INSERT INTO position_craft_type_relation (position_id, craft_type_id)
+--                 VALUES (_position_id, _craft_type_id);
+--         ELSE RAISE EXCEPTION 'Position or craft_type does not exists.';
+--         end if;
+--     END;
+-- $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_position_craft_type_relation (position_name text, craft_type_name text) RETURNs void as
 $$
-    DECLARE
-        _position_id integer;
-        _craft_type_id integer;
-    BEGIN
-        SELECT get_position_id_by_name(position_name) INTO _position_id;
-        SELECT get_position_id_by_name(craft_type_name) INTO _craft_type_id;
-        IF _position_id IS NOT NULL and _craft_type_id IS NOT NULL
-            THEN
-                INSERT INTO position_craft_type_relation (position_id, craft_type_id)
-                VALUES (_position_id, _craft_type_id)
-                RETURNING (position_id, craft_type_id);
-        ELSE RAISE EXCEPTION 'Position or craft_type does not exists.';
-        end if;
-    END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO position_craft_type_relation (position_id, craft_type_id)
+    VALUES (get_position_id_by_name(position_name),
+            get_craft_type_id_id_by_name(craft_type_name));
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _date date ) RETURNS integer AS
     $$
@@ -514,25 +520,25 @@ CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position tex
         RETURNING id;
     $$ language sql;
 
-CREATE OR REPLACE FUNCTION insert_person_position_history (person_name text, person_position text, person_hire_date date) RETURNS integer AS
-$$
-    DECLARE
-        person_id_val integer;
-        person_position_id integer;
-    BEGIN
-        SELECT get_person_id_by_name(person_name) INTO person_id_val;
-        SELECT get_position_id_by_name(person_position) INTO person_position_id;
-        IF person_id_val IS NOT NULL and person_position_id IS NOT NULL and person_hire_date IS NOT NULL
-            THEN
-                INSERT INTO person_position_history (person_id, position_id, hire_date)
-                VALUES (person_id_val, person_position_id, person_hire_date)
-                RETURNING id;
-        ELSE
-            RAISE EXCEPTION 'Wrong inputs.';
-Return null;
-END iF;
-END;
-$$ LANGUAGE plpgsql;
+-- CREATE OR REPLACE FUNCTION insert_person_position_history (person_name text, person_position text, person_hire_date date) RETURNS integer AS
+-- $$
+--     DECLARE
+--         person_id_val integer;
+--         person_position_id integer;
+--     BEGIN
+--         SELECT get_person_id_by_name(person_name) INTO person_id_val;
+--         SELECT get_position_id_by_name(person_position) INTO person_position_id;
+--         IF person_id_val IS NOT NULL and person_position_id IS NOT NULL and person_hire_date IS NOT NULL
+--             THEN
+--                 INSERT INTO person_position_history (person_id, position_id, hire_date)
+--                 VALUES (person_id_val, person_position_id, person_hire_date)
+--                 RETURNING id;
+--         ELSE
+--             RAISE EXCEPTION 'Wrong inputs.';
+-- Return null;
+-- END iF;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE FUNCTION update_person_position_history (person_position_history_id integer, person_dismissal_date date) RETURNS person_position_history AS
 $$
@@ -574,18 +580,24 @@ $$
     INSERT INTO Building_type (type_name) VALUES (building_type_name) RETURNING (id);
 $$ LANGUAGE sql;
 
+-- CREATE OR REPLACE FUNCTION insert_building (new_building_type_name text) RETURNS integer AS
+-- $$
+--     DECLARE
+--         new_building_type_id integer;
+--     BEGIN
+--         SELECT get_building_type_id_by_name(new_building_type_name) INTO new_building_type_id;
+--         IF new_building_type_id IS NOT NULL
+--             THEN
+--                 INSERT INTO BUILDING (building_type_id) VALUES (new_building_type_id) RETURNING *;
+--         end if;
+--     RETURN *;
+--     END;
+-- $$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION insert_building (new_building_type_name text) RETURNS integer AS
 $$
-    DECLARE
-        new_building_type_id integer;
-    BEGIN
-        SELECT get_building_type_id_by_name(new_building_type_name) INTO new_building_type_id;
-        IF new_building_type_id IS NOT NULL
-            THEN
-                INSERT INTO BUILDING (building_type_id) VALUES (new_building_type_id) RETURNING (building.id);
-        end if;
-    END;
-$$ LANGUAGE plpgsql;
+    INSERT INTO building (building_type_id) VALUES (get_building_type_id_by_name(new_building_type_name)) RETURNING (id);
+$$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION insert_building_construction_artefact (responsible_person_name text, new_building_type text, building_construction_beginning_date date) RETURNS integer AS
 $$
@@ -593,15 +605,17 @@ $$
         responsible_id integer;
         new_building_type_id integer;
         new_building_id integer;
+        artefact_id integer;
     BEGIN
         SELECT get_person_id_by_name(responsible_person_name) INTO responsible_id;
-        SELECT get_building_type_id_by_name(new_building_type) INTO new_building_type_id;
         IF responsible_id IS NOT NULL and new_building_type_id IS NOT NULL and building_construction_beginning_date IS NOT NULL
             THEN
-                SELECT insert_building(new_building_type_id) INTO new_building_id;
-                INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date) VALUES (new_building_id, responsible_person_id, building_construction_beginning_date)
-                RETURNING building_construction_artefact.building_id;
+                SELECT insert_building(new_building_type) INTO new_building_id;
+                INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date)
+                VALUES (new_building_id, responsible_id, building_construction_beginning_date)
+                RETURNING building_construction_artefact.building_id INTO artefact_id;
         end if;
+        return artefact_id;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -610,14 +624,16 @@ $$
     DECLARE
         responsible_id integer;
         new_building_id integer;
+        artefact_id integer;
     BEGIN
         SELECT get_person_id_by_name(responsible_person_name) INTO responsible_id;
         IF responsible_id IS NOT NULL and is_building_exists(new_building_id) and building_construction_beginning_date IS NOT NULL
             THEN
                 INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date)
                 VALUES (new_building_id, responsible_id, building_construction_beginning_date)
-                RETURNING building_construction_artefact.building_id;
+                RETURNING building_construction_artefact.building_id INTO artefact_id;
         end if;
+        RETURN artefact_id;
     END;
 $$ LANGUAGE plpgsql;
 

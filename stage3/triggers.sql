@@ -106,3 +106,52 @@ $$
         COMMIT;
     END;
 $$ LANGUAGE plpgsql;
+
+-- -- Триггер как ограничние целосности к БП 3
+
+
+create or replace function check_person_family_transition() returns trigger as $$
+declare
+  declare person_current_position integer =
+  (
+    select position_id from person_position_history
+      where person_position_history.position_id = OLD.id
+  );
+  declare person_prev_position_id integer=
+  (
+    select position_id from person_position_history
+    where person_position_history.position_id = OLD.id
+    order by person_position_history.hire_date desc
+    offset 1
+  );
+  declare craft_of_new_family varchar =
+  (
+    select craft_type_id from family where family.id = NEW.family_id
+  );
+begin
+  if NEW.family_id <> OLD.family_id then
+--   Проверяем, изменился ли интерес у персона и совпадает ли интерес с новой семьей
+    if person_current_position = person_prev_position_id then
+      raise exception 'Поменять семью не имеет смысла.У пользователя не менялся интерес.';
+    end if;
+
+    if not exists(
+      select id from position_craft_type_relation
+        where position_craft_type_relation.position_id = NEW.position_id
+        and position_craft_type_relation.craft_type_id = craft_of_new_family
+    ) then
+      raise exception 'Невозможно поменять семью. Интересы семьи и пользователя не совпадают';
+
+    end if;
+
+--       проверка равенства ремесел.
+  end if;
+  return NEW;
+end;
+$$ language plpgsql;
+
+create or replace trigger check_person_family_transition_trigger
+  after update
+  on person
+  for each row
+  execute function check_person_family_transition();

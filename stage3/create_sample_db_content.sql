@@ -128,9 +128,10 @@ SELECT insert_family('Gardening', VARIADIC ARRAY[
     get_person_id_by_name('Evgeniy Krivchov')
            ]);
 
+-- SELECT update_person('Alex Mayhem', );
+
 SELECT insert_building('Farm');
 
--- | need fix
 SELECT insert_building_construction_artefact('Sid Floyd', 'Farm', make_date(2005, 5, 13));
 SELECT insert_building_construction_artefact('Sid Floyd', 'Workshop', make_date(2005, 5, 15));
 SELECT insert_building_construction_artefact('Sid Floyd', 'Living', make_date(2005, 5, 17));
@@ -148,10 +149,9 @@ SELECT insert_event_group_countries('Antanta', 'Sweden');
 SELECT insert_event_group_countries('Bechennie', 'Poland');
 SELECT insert_event_group_countries('Crutie', 'Finland');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
--- | fix
-SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8), Variadic ARRAY['Antanta', 'Bechennie']::text[]);
+
+SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8), Variadic ARRAY['Antanta', 'Bechennie']);
 SELECT insert_country_relationship_event('Peaceful state', make_date(2023, 11, 8));
--- | fix
 SELECT insert_country_relationship_event('In state of conflict', make_date(2015, 11, 8), VARIADIC ARRAY['Crutie', 'Ne pri delah']);
 
 SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Crutie');
@@ -160,3 +160,5 @@ SELECT insert_relationship_events_groups((Select id from country_relationship_ev
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.2);
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.5);
 SELECT get_or_insert_resource_usage_type_id_by_amount(50);
+
+-- SELECT insert_people_detachment_to_building();

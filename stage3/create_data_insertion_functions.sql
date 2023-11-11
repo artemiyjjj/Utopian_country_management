@@ -232,7 +232,7 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_name_set text[]) RETURNS integer AS
 $$
     DECLARE
-        group_name integer;
+        group_name text;
         country_relationship_event_id integer;
     BEGIN
         SELECT insert_country_relationship_event(political_status_name, event_start_date) INTO country_relationship_event_id;
@@ -650,7 +650,7 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_people_detachment_to_building (detached_person_name text, new_building_id integer) RETURNS people_detachment_to_building AS
+CREATE OR REPLACE FUNCTION insert_people_detachment_to_building (detached_person_name text, new_building_id integer) RETURNS void AS
 $$
     DECLARE
         detached_person_id integer;
@@ -659,8 +659,7 @@ $$
         IF is_building_exists(new_building_id) and detached_person_id IS NOT NULL
             THEN
                 INSERT INTO people_detachment_to_building (person_id, building_id)
-                VALUES (detached_person_id, new_building_id)
-                RETURNING (person_id, building_id);
+                VALUES (detached_person_id, new_building_id);
         END IF;
     END;
 $$ LANGUAGE plpgsql;

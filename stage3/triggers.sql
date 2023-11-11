@@ -136,7 +136,7 @@ begin
     end if;
 
     if not exists(
-      select id from position_craft_type_relation
+      select 1 from position_craft_type_relation
         where position_craft_type_relation.position_id = NEW.position_id
         and position_craft_type_relation.craft_type_id = craft_of_new_family
     ) then

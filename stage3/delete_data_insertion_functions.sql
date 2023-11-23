@@ -1,3 +1,11 @@
+DROP FUNCTION IF EXISTS get_random_int_in_range (_from integer, _to integer) CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_double_in_range (_from double precision, _to double precision) CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_string(length integer) CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_string_with_delimiter() CASCADE;
+
 DROP FUNCTION IF EXISTS get_country_id_by_name(country_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS get_event_group_id_by_name(event_group_name text) CASCADE;
@@ -6,7 +14,13 @@ DROP FUNCTION IF EXISTS get_political_status_id_by_name (political_status_name t
 
 DROP FUNCTION IF EXISTS get_position_id_by_name (position_name text) CASCADE;
 
+DROP FUNCTION IF EXISTS get_position_id_by_craft_type (_craft_type_id integer) CASCADE;
+
+DROP FUNCTION IF EXISTS get_craft_type_id_by_position (_position_id integer) CASCADE;
+
 DROP FUNCTION IF EXISTS get_person_id_by_name (person_name text) CASCADE;
+
+DROP FUNCTION IF EXISTS get_family_id_by_filarch_name (filarch_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS get_craft_type_id_id_by_name (craft_type_name text) CASCADE;
 
@@ -19,6 +33,8 @@ DROP FUNCTION IF EXISTS get_building_type_id_by_name (building_type_name text) C
 DROP FUNCTION IF EXISTS is_building_exists(building_id integer) CASCADE;
 
 DROP FUNCTION IF EXISTS is_family_exists(family_id integer) CASCADE;
+
+DROP FUNCTION IF EXISTS is_craft_type_exists (craft_type_id integer) CASCADE;
 
 DROP FUNCTION IF EXISTS is_resource_exists (resource_id integer) CASCADE;
 
@@ -51,6 +67,8 @@ DROP FUNCTION IF EXISTS insert_country_relationship_event (political_status_name
 DROP FUNCTION IF EXISTS insert_country_relationship_event (political_status_name text, event_start_date date, groups_id integer) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_name_set text[]) CASCADE;
+
+DROP FUNCTION IF EXISTS insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_id_array integer[]) CASCADE;
 
 DROP FUNCTION IF EXISTS update_country_relationship_event (event_id integer, event_end_date date) CASCADE;
 
@@ -107,6 +125,8 @@ DROP FUNCTION IF EXISTS insert_position_history(_person text, _position text, _d
 
 DROP FUNCTION IF EXISTS _insert_position_history(_person text, _position text, _date date) CASCADE;
 
+DROP FUNCTION IF EXISTS _insert_position_history (_person_id integer, _position_id integer, _date date ) CASCADE;
+
 DROP FUNCTION IF EXISTS _insert_position_history(_person text, _position text, _hire_date date, _dismissal_date date) CASCADE;
 
 DROP FUNCTION IF EXISTS update_person_position_history (person_position_history_id integer, person_dismissal_date date) CASCADE;
@@ -125,9 +145,33 @@ DROP FUNCTION IF EXISTS insert_building_construction_artefact (responsible_perso
 
 DROP FUNCTION IF EXISTS insert_building_construction_artefact (responsible_person_name text, new_building_id integer, building_construction_beginning_date date) CASCADE;
 
+DROP FUNCTION IF EXISTS insert_building_construction_artefact (responsible_person_id integer, new_building_id integer, building_construction_beginning_date date) CASCADE;
+
 DROP FUNCTION IF EXISTS update_building_construction_artefact (new_building_id integer, building_construction_end_date date) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_people_detachment_to_building (detached_person_name text, the_building_id integer) CASCADE;
 
 
 DROP FUNCTION IF EXISTS allocate_resource_to_family(_family_id integer, _resource_type_name text, _resource_quantity double precision) CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_utopian_position_id() CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_utopian_management_position_id() CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_filarch() CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_protofilarch() CASCADE;
+
+DROP FUNCTION IF EXISTS get_random_foreign_position_id() CASCADE;
+
+DROP FUNCTION IF EXISTS generate_resource_storages(min_amount integer, max_amount integer, min_quantity double precision, max_quantity double precision, _resource_type_name text) CASCADE;
+
+DROP FUNCTION IF EXISTS generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) CASCADE;
+
+DROP FUNCTION IF EXISTS generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) CASCADE;
+
+DROP FUNCTION IF EXISTS generate_utopian_people (min_people_amount integer, max_people_amount integer, family_size integer) CASCADE;
+
+DROP FUNCTION IF EXISTS generate_building_construction_artefacts(min_amount integer, max_amount integer, building_type_name text) CASCADE;
+
+DROP FUNCTION IF EXISTS generate_people_detachment_to_building() CASCADE;

@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS Family
 (
     id            SERIAL,
     craft_type_id integer REFERENCES Craft_type (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    responsible_person_id integer UNIQUE REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET DEFAULT,
+    responsible_person_id integer UNIQUE,
     PRIMARY KEY (id)
 );
 
@@ -134,6 +134,9 @@ CREATE TABLE IF NOT EXISTS Person
 
 ALTER TABLE Country
     ADD CONSTRAINT leader_foreign_key FOREIGN KEY (leader_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE Family
+    ADD CONSTRAINT responsible_foreign_key FOREIGN KEY (responsible_person_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET DEFAULT;
 
 CREATE TABLE IF NOT Exists Position
 (

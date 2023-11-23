@@ -1,3 +1,39 @@
+CREATE OR REPLACE FUNCTION get_random_int_in_range (_from integer, _to integer) RETURNS integer AS
+$$
+    SELECT (random() * (_to - _from)) + _from;
+$$ language sql;
+
+CREATE OR REPLACE FUNCTION get_random_double_in_range (_from double precision, _to double precision) RETURNS double precision AS
+$$
+    SELECT (random() * (_to - _from)) + _from;
+$$ language sql;
+
+CREATE OR REPLACE FUNCTION get_random_string(length integer) RETURNS text AS
+$$
+DECLARE  chars text[] := '{A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z}';
+  result text := '';
+  i integer := 0;
+BEGIN
+  if length < 0
+      THEN RAISE EXCEPTION 'Length cannot be less than 0';
+  end if;
+  for i in 1..length loop
+    result := result || chars[1+random()*(array_length(chars, 1)-1)];
+  end loop;
+  RETURN result;
+end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION get_random_string_with_delimiter() RETURNS text AS
+$$
+DECLARE
+    result text := '';
+BEGIN
+    result := get_random_string(get_random_int_in_range(5, 15)) || ' ' || get_random_string(get_random_int_in_range(8, 12));
+    RETURN result;
+end;
+$$ language plpgsql;
+
 CREATE OR REPLACE FUNCTION get_country_id_by_name(country_name text) RETURNS integer AS
 $$
     SELECT id FROM Country WHERE name = country_name;
@@ -21,9 +57,24 @@ $$
     SELECT id FROM Position WHERE name = position_name;
 $$ LANGUAGE sql;
 
+CREATE OR REPLACE FUNCTION get_position_id_by_craft_type (_craft_type_id integer) RETURNS integer AS
+$$
+    SELECT position_id FROM position_craft_type_relation WHERE craft_type_id = _craft_type_id;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION get_craft_type_id_by_position (_position_id integer) RETURNS integer AS
+$$
+    SELECT craft_type_id FROM position_craft_type_relation WHERE position_id = _position_id;
+$$ LANGUAGE sql;
+
 CREATE OR REPLACE FUNCTION get_person_id_by_name (person_name text) RETURNS integer AS
 $$
     SELECT id FROM Person WHERE name = person_name;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION get_family_id_by_filarch_name (filarch_name text) RETURNS integer AS
+$$
+    SELECT id FROM family WHERE responsible_person_id = get_person_id_by_name(filarch_name);
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION get_craft_type_id_id_by_name (craft_type_name text) RETURNS integer AS
@@ -62,6 +113,13 @@ CREATE OR REPLACE FUNCTION is_building_exists (building_id integer) RETURNS bool
 $$
     BEGIN
         RETURN EXISTS (SELECT 1 FROM building WHERE id = building_id);
+    end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION is_craft_type_exists (craft_type_id integer) RETURNS bool AS
+$$
+    BEGIN
+        RETURN EXISTS( SELECT 1 FROM craft_type WHERE id = craft_type_id);
     end;
 $$ LANGUAGE plpgsql;
 
@@ -143,6 +201,7 @@ $$
     BEGIN
         SELECT get_person_id_by_name(leader_name) INTO person_leader_id;
         SELECT get_country_id_by_name(country_name) INTO country_id;
+--         RAISE info 'old: %', (Select leader_id from country where id = country_id);
         IF country_id IS NOT NULL and person_leader_id IS NOT NULL
             THEN
                 UPDATE country
@@ -150,6 +209,7 @@ $$
                     WHERE id = country_id;
 --                 RETURNING *;
         end if;
+--         RAISE info 'new: %', person_leader_id;
         RETURN;
     end;
 $$ LANGUAGE plpgsql;
@@ -197,6 +257,17 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION insert_relationship_events_groups (event_id integer, group_id integer) RETURNS void AS
+$$
+    BEGIN
+        IF is_event_group_exists(group_id) and is_country_relationship_event_exists(event_id)
+            THEN
+                INSERT INTO event_groups (id, event_group_id) VALUES (event_id, group_id);
+        END IF;
+    RETURN;
+    END;
+$$ LANGUAGE plpgsql;
+
 CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date) RETURNS integer AS
 $$
     DECLARE
@@ -229,17 +300,17 @@ $$ LANGUAGE plpgsql;
 --     END;
 -- $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_name_set text[]) RETURNS integer AS
+CREATE OR REPLACE FUNCTION insert_country_relationship_event (political_status_name text, event_start_date date, VARIADIC event_groups_id_array integer[]) RETURNS integer AS
 $$
     DECLARE
-        group_name text;
+        group_id integer;
         country_relationship_event_id integer;
     BEGIN
         SELECT insert_country_relationship_event(political_status_name, event_start_date) INTO country_relationship_event_id;
         IF country_relationship_event_id IS NOT NULL
             THEN
-                FOREACH group_name IN ARRAY event_groups_name_set LOOP
-                    PERFORM insert_relationship_events_groups(country_relationship_event_id, group_name);
+                FOREACH group_id IN ARRAY event_groups_id_array LOOP
+                    PERFORM insert_relationship_events_groups(country_relationship_event_id, group_id);
                 END LOOP;
         END IF;
         RETURN country_relationship_event_id;
@@ -336,6 +407,11 @@ $$
     INSERT INTO Family (craft_type_id)
     VALUES
         (get_craft_type_id_id_by_name(craft_type_name)) RETURNING (id);
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION insert_family(_craft_type_id integer) RETURNS integer AS
+$$
+    INSERT INTO Family (craft_type_id) VALUES (_craft_type_id) RETURNING (id);
 $$ LANGUAGE sql;
 
 CREATE OR REPLACE FUNCTION insert_family(craft_type_name text, VARIADIC person_id integer[]) RETURNS integer AS
@@ -513,6 +589,13 @@ CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position tex
         RETURNING id;
     $$ language sql;
 
+CREATE OR REPLACE FUNCTION _insert_position_history (_person_id integer, _position_id integer, _date date ) RETURNS integer AS
+    $$
+        INSERT INTO person_position_history (person_id, position_id, hire_date)
+        VALUES (_person_id, _position_id, _date )
+        RETURNING id;
+    $$ language sql;
+
 CREATE OR REPLACE FUNCTION _insert_position_history (_person text, _position text, _hire_date date, _dismissal_date date ) RETURNS integer AS
     $$
         INSERT INTO person_position_history (person_id, position_id, hire_date, dismissal_date)
@@ -619,19 +702,22 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_building_construction_artefact (responsible_person_name text, new_building_id integer, building_construction_beginning_date date) RETURNS integer AS
+CREATE OR REPLACE FUNCTION insert_building_construction_artefact (_responsible_person_id integer, new_building_type_name text, building_construction_beginning_date date) RETURNS integer AS
 $$
     DECLARE
-        responsible_id integer;
         new_building_id integer;
         artefact_id integer;
     BEGIN
-        SELECT get_person_id_by_name(responsible_person_name) INTO responsible_id;
-        IF responsible_id IS NOT NULL and is_building_exists(new_building_id) and building_construction_beginning_date IS NOT NULL
+
+        IF building_construction_beginning_date IS NOT NULL
             THEN
+                IF NOT is_building_exists(new_building_id)
+                    THEN SELECT insert_building(new_building_type_name) INTO new_building_id;
+                END IF;
                 INSERT INTO building_construction_artefact (building_id, responsible_person_id, construction_beginning_date)
-                VALUES (new_building_id, responsible_id, building_construction_beginning_date)
+                VALUES (new_building_id, _responsible_person_id, building_construction_beginning_date)
                 RETURNING building_construction_artefact.building_id INTO artefact_id;
+        ELSE RAISE EXCEPTION 'Conditions are failed.';
         end if;
         RETURN artefact_id;
     END;

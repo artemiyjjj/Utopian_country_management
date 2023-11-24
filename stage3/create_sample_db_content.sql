@@ -248,6 +248,7 @@ $$
                     PERFORM places_in_family[array_index] = 0;
             end if;
             PERFORM _insert_position_history(added_person_id, position_id, CURRENT_DATE);
+            PERFORM _insert_position_history(added_person_id, get_random_utopian_position_id(), CURRENT_DATE - get_random_int_in_range(1, 10));
         end loop;
     END
 $$ LANGUAGE plpgsql;
@@ -321,10 +322,28 @@ SELECT insert_event_group_countries('Crutie', 'Finland');
 SELECT insert_event_group_countries('Crutie', 'Great Britain');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
 
-SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8),
+-- CREATE OR REPLACE FUNCTION generate_country_relationships (min_amount integer, max_amount integer) RETURNS void AS
+-- $$
+--     DECLARE
+--         chance double precision;
+-- BEGIN
+--     For i in 1..get_random_int_in_range(min_amount, max_amount) LOOP
+--         SELECT get_random_double_in_range(0, 1) INTO chance;
+--         if chance > 0.9
+--             THEN PERFORM insert_country_relationship_event('War', CURRENT_DATE,
+--                                                            VARIADIC ARRAY [ge]) ;
+--         end loop;
+-- end;
+--
+-- $$ language plpgsql;
+
+SELECT insert_country_relationship_event('War', make_date(2020, 11, 8),
                                          Variadic ARRAY[get_event_group_id_by_name('Antanta'), get_event_group_id_by_name('Bechennie')]);
-SELECT insert_country_relationship_event('Peaceful state', make_date(2023, 11, 8));
-SELECT insert_country_relationship_event('In state of conflict', make_date(2015, 11, 8),
+SELECT insert_country_relationship_event('Peace', make_date(2023, 11, 8),
+                                         VARIADIC ARRAY [get_event_group_id_by_name('Ne pri delah'), get_event_group_id_by_name('Bechennie')]);
+SELECT insert_country_relationship_event('Conflict', make_date(2015, 11, 8),
+                                         VARIADIC ARRAY[get_event_group_id_by_name('Crutie'), get_event_group_id_by_name('Ne pri delah')]);
+SELECT insert_country_relationship_event('Cooperation', make_date(2018, 11, 8),
                                          VARIADIC ARRAY[get_event_group_id_by_name('Crutie'), get_event_group_id_by_name('Ne pri delah')]);
 
 SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Crutie');

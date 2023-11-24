@@ -122,9 +122,9 @@ $$
 $$ language plpgsql;
 
 SELECT generate_resource_storages(5, 10, 100, 1500, 'Gold');
-SELECT generate_resource_storages(20, 30, 1000, 20000, 'Water');
-SELECT generate_resource_storages(6, 25, 5000, 450000, 'Wood');
-SELECT generate_resource_storages(15, 50, 500, 6000, 'Food');
+SELECT generate_resource_storages(40, 100, 10000, 2000000, 'Water');
+SELECT generate_resource_storages(20, 50, 50000, 450000, 'Wood');
+SELECT generate_resource_storages(40, 100, 1500, 300000, 'Food');
 SELECT generate_resource_storages(3, 20, 300, 10000, 'Oil');
 SELECT generate_resource_storages(10, 30, 2000, 100000, 'Stone');
 
@@ -239,7 +239,7 @@ $$
                         EXIT;
                 END IF;
                 end loop;
-            RAISE INFO '% arr ind', array_index;
+--             RAISE INFO '% arr ind', array_index;
             SELECT insert_person(get_random_string_with_delimiter(), 'Utopia', available_families[array_index]) INTO added_person_id;
             places_in_family[array_index] = places_in_family[array_index] + 1;
             IF places_in_family[array_index] >= family_size
@@ -292,6 +292,22 @@ $$ LANGUAGE plpgsql;
 
 SELECT generate_people_detachment_to_building();
 
+CREATE OR REPLACE FUNCTION generate_resources_to_families(min_resource_amount double precision, max_resource_amount double precision) RETURNS void AS
+$$
+    DECLARE
+        _family_id integer;
+        _resource_id integer;
+    BEGIN
+        FOR _family_id in SELECT id FROM Family LOOP
+            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Water', get_random_double_in_range(min_resource_amount, max_resource_amount))));
+            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Food', get_random_double_in_range(min_resource_amount, max_resource_amount))));
+            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Wood', get_random_double_in_range(min_resource_amount, max_resource_amount))));
+        end loop;
+    end;
+$$ language plpgsql;
+
+SELECT generate_resources_to_families(50, 150);
+
 SELECT insert_event_group('Antanta');
 SELECT insert_event_group('Bechennie');
 SELECT insert_event_group('Ognennie');
@@ -302,6 +318,7 @@ SELECT insert_event_group_countries('Antanta', 'Finland');
 SELECT insert_event_group_countries('Antanta', 'Sweden');
 SELECT insert_event_group_countries('Bechennie', 'Poland');
 SELECT insert_event_group_countries('Crutie', 'Finland');
+SELECT insert_event_group_countries('Crutie', 'Great Britain');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
 
 SELECT insert_country_relationship_event('In state of war', make_date(2020, 11, 8),

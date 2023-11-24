@@ -175,3 +175,5 @@ DROP FUNCTION IF EXISTS generate_utopian_people (min_people_amount integer, max_
 DROP FUNCTION IF EXISTS generate_building_construction_artefacts(min_amount integer, max_amount integer, building_type_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS generate_people_detachment_to_building() CASCADE;
+
+DROP FUNCTION IF EXISTS generate_resources_to_families(min_resource_amount double precision, max_resource_amount double precision) CASCADE;

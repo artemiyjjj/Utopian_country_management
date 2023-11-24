@@ -32,6 +32,8 @@ TRUNCATE TABLE position CASCADE;
 
 TRUNCATE TABLE person_position_history CASCADE;
 
+TRUNCATE TABLE position_craft_type_relation CASCADE;
+
 TRUNCATE TABLE report CASCADE;
 
 TRUNCATE TABLE building_type CASCADE;

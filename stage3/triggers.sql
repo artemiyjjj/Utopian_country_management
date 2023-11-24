@@ -155,3 +155,41 @@ create or replace trigger check_person_family_transition_trigger
   on person
   for each row
   execute function check_person_family_transition();
+
+CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type integer, resource_amount double precision) RETURNS integer AS
+$$
+    DECLARE
+        _found_resource_storage_id integer;
+        _resource_id integer;
+    BEGIN
+        SELECT id from resource_storage where resource_type_id = resource_type and current_quantity >= resource_amount INTO _found_resource_storage_id ORDER BY random() LIMIT 1;
+        IF _found_resource_storage_id IS NULL
+            THEN RAISE EXCEPTION 'No storage found.';
+        ELSE
+            BEGIN
+                UPDATE resource_storage SET current_quantity = current_quantity - resource_amount
+                WHERE id = _found_resource_storage_id;
+                SELECT insert_resource(_found_resource_storage_id, resource_amount) INTO _resource_id;
+            end;
+        END IF;
+        RETURN _resource_id;
+    end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type text, resource_amount double precision) RETURNS integer AS
+$$
+    DECLARE
+        _resource_type_id integer;
+    BEGIN
+        SELECT get_resource_type_id_by_name(resource_type) INTO _resource_type_id;
+        RETURN (SELECT get_resource_from_resource_storage(_resource_type_id, resource_amount));
+    end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION update_resource_storages_quantities (_resource_storage_id integer, _resource_addition_amount double precision) RETURNS void AS
+$$
+    BEGIN
+        UPDATE resource_storage SET current_quantity = current_quantity + _resource_addition_amount
+        WHERE id = _resource_storage_id;
+    end;
+$$ language plpgsql;

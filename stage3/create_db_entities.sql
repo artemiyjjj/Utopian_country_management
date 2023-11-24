@@ -112,7 +112,7 @@ CREATE TABLE IF NOT EXISTS Family
 (
     id            SERIAL,
     craft_type_id integer REFERENCES Craft_type (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    responsible_person_id integer UNIQUE,
+    responsible_person_id integer,
     PRIMARY KEY (id)
 );
 

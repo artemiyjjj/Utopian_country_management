@@ -363,12 +363,15 @@ CREATE OR REPLACE FUNCTION _insert_resource_storage (_resource_type_name text, _
 
 CREATE OR REPLACE FUNCTION insert_resource (storage_id integer, resource_initial_quantity double precision) RETURNS integer AS
 $$
+    DECLARE
+        _resource_id integer;
     BEGIN
         IF is_resource_storage_exists(storage_id) and resource_initial_quantity >= 0
             THEN INSERT INTO Resource (resource_storage_id, initial_quantity)
                 VALUES (storage_id, resource_initial_quantity)
-                RETURNING id;
+                RETURNING id INTO _resource_id;
         END IF;
+        RETURN _resource_id;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -428,14 +431,24 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION insert_family_resource_ownership (family_id_val integer, resource_id_val integer) RETURNS family_resource_ownership AS
+CREATE OR REPLACE FUNCTION insert_family(craft_type integer, responsible_person integer) RETURNS integer AS
+$$
+    DECLARE
+        _family_id integer;
+    BEGIN
+        INSERT INTO family (craft_type_id, responsible_person_id)
+        VALUES (craft_type, responsible_person) RETURNING (id) INTO _family_id;
+        RETURN _family_id;
+    end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_family_resource_ownership (family_id_val integer, resource_id_val integer) RETURNS void AS
 $$
     BEGIN
         IF is_family_exists(family_id_val) and is_resource_exists(resource_id_val)
             THEN
                 INSERT INTO family_resource_ownership (family_id, resource_id)
-                VALUES (family_id_val, resource_id_val)
-                RETURNING (family_id, resource_id);
+                VALUES (family_id_val, resource_id_val);
         END IF;
     END;
 $$ LANGUAGE plpgsql;

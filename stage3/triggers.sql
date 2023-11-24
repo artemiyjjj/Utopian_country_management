@@ -1,3 +1,41 @@
+CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type integer, resource_amount double precision) RETURNS integer AS
+$$
+    DECLARE
+        _found_resource_storage_id integer;
+        _resource_id integer;
+    BEGIN
+        SELECT id from resource_storage where resource_type_id = resource_type and current_quantity >= resource_amount INTO _found_resource_storage_id ORDER BY random() LIMIT 1;
+        IF _found_resource_storage_id IS NULL
+            THEN RAISE EXCEPTION 'No storage found.';
+        ELSE
+            BEGIN
+                UPDATE resource_storage SET current_quantity = current_quantity - resource_amount
+                WHERE id = _found_resource_storage_id;
+                SELECT insert_resource(_found_resource_storage_id, resource_amount) INTO _resource_id;
+            end;
+        END IF;
+        RETURN _resource_id;
+    end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type text, resource_amount double precision) RETURNS integer AS
+$$
+    DECLARE
+        _resource_type_id integer;
+    BEGIN
+        SELECT get_resource_type_id_by_name(resource_type) INTO _resource_type_id;
+        RETURN (SELECT get_resource_from_resource_storage(_resource_type_id, resource_amount));
+    end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION update_resource_storages_quantities (_resource_storage_id integer, _resource_addition_amount double precision) RETURNS void AS
+$$
+    BEGIN
+        UPDATE resource_storage SET current_quantity = current_quantity + _resource_addition_amount
+        WHERE id = _resource_storage_id;
+    end;
+$$ language plpgsql;
+
 -- --   Триггер БП 2 к
 -- -- тригер или функция что лучше для бл на стороне бд? процедуры vs функции,
 -- -- можно ли объявлять переменные внутири
@@ -95,15 +133,11 @@ create or replace function allocate_resource_to_family(_family_id integer, _reso
 $$
     DECLARE
         _resource_type_id integer;
-        _resource_storage_id integer;
         _resource_id integer;
     BEGIN
         SELECT get_resource_type_id_by_name(_resource_type_name) INTO _resource_type_id;
-        SELECT id FROM resource_storage where resource_type_id = _resource_type_id and current_quantity >= _resource_quantity INTO _resource_storage_id;
-        UPDATE resource_storage SET current_quantity = current_quantity - _resource_quantity WHERE id = _resource_storage_id;
-        SELECT insert_resource(_resource_storage_id, _resource_quantity) INTO _resource_id;
+        SELECT get_resource_from_resource_storage(_resource_type_id, _resource_quantity) INTO _resource_id;
         PERFORM insert_family_resource_ownership(_family_id, _resource_id);
-        COMMIT;
     END;
 $$ LANGUAGE plpgsql;
 
@@ -156,40 +190,3 @@ create or replace trigger check_person_family_transition_trigger
   for each row
   execute function check_person_family_transition();
 
-CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type integer, resource_amount double precision) RETURNS integer AS
-$$
-    DECLARE
-        _found_resource_storage_id integer;
-        _resource_id integer;
-    BEGIN
-        SELECT id from resource_storage where resource_type_id = resource_type and current_quantity >= resource_amount INTO _found_resource_storage_id ORDER BY random() LIMIT 1;
-        IF _found_resource_storage_id IS NULL
-            THEN RAISE EXCEPTION 'No storage found.';
-        ELSE
-            BEGIN
-                UPDATE resource_storage SET current_quantity = current_quantity - resource_amount
-                WHERE id = _found_resource_storage_id;
-                SELECT insert_resource(_found_resource_storage_id, resource_amount) INTO _resource_id;
-            end;
-        END IF;
-        RETURN _resource_id;
-    end;
-$$ language plpgsql;
-
-CREATE OR REPLACE FUNCTION get_resource_from_resource_storage(resource_type text, resource_amount double precision) RETURNS integer AS
-$$
-    DECLARE
-        _resource_type_id integer;
-    BEGIN
-        SELECT get_resource_type_id_by_name(resource_type) INTO _resource_type_id;
-        RETURN (SELECT get_resource_from_resource_storage(_resource_type_id, resource_amount));
-    end;
-$$ language plpgsql;
-
-CREATE OR REPLACE FUNCTION update_resource_storages_quantities (_resource_storage_id integer, _resource_addition_amount double precision) RETURNS void AS
-$$
-    BEGIN
-        UPDATE resource_storage SET current_quantity = current_quantity + _resource_addition_amount
-        WHERE id = _resource_storage_id;
-    end;
-$$ language plpgsql;

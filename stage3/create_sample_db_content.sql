@@ -346,8 +346,8 @@ SELECT insert_country_relationship_event('Conflict', make_date(2015, 11, 8),
 SELECT insert_country_relationship_event('Cooperation', make_date(2018, 11, 8),
                                          VARIADIC ARRAY[get_event_group_id_by_name('Crutie'), get_event_group_id_by_name('Ne pri delah')]);
 
-SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Crutie');
-SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Ne pri delah');
+-- SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Crutie');
+-- SELECT insert_relationship_events_groups((Select id from country_relationship_event_history where start_event_date = make_date(2023, 11, 8)), 'Ne pri delah');
 
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.2);
 SELECT get_or_insert_resource_usage_type_id_by_amount(0.5);

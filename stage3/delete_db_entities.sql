@@ -30,6 +30,8 @@ DROP TABLE IF EXISTS person_position_history CASCADE;
 
 DROP TABLE IF EXISTS position CASCADE;
 
+DROP TABLE IF EXISTS position_craft_type_relation CASCADE;
+
 DROP TABLE IF EXISTS Person CASCADE;
 
 

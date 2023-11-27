@@ -651,6 +651,7 @@ $$
     DECLARE
         person_sender_id integer;
         person_receiver_id integer;
+        report_id integer;
     BEGIN
         SELECT get_person_id_by_name(person_sender_name) INTO person_sender_id;
         SELECT get_person_id_by_name(person_receiver_name) INTO person_receiver_id;
@@ -658,8 +659,24 @@ $$
             THEN
                 INSERT INTO Report (title, contents, sender_id, receiver_id, delivered)
                 VALUES (report_title, report_contents, person_sender_id, person_receiver_id, FALSE)
-                RETURNING id;
+                RETURNING id INTO report_id;
         end if;
+        RETURN report_id;
+    end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION insert_report (report_title text, report_contents text, person_sender_id integer, person_receiver_id integer) RETURNS integer AS
+$$
+    DECLARE
+        report_id integer;
+    BEGIN
+        IF person_sender_id IS NOT NULL and person_receiver_id IS NOT NULL and report_title IS NOT NULL and report_contents IS NOT NULL
+            THEN
+                INSERT INTO Report (title, contents, sender_id, receiver_id, delivered)
+                VALUES (report_title, report_contents, person_sender_id, person_receiver_id, FALSE)
+                RETURNING id INTO report_id;
+        end if;
+        RETURN report_id;
     end;
 $$ LANGUAGE plpgsql;
 

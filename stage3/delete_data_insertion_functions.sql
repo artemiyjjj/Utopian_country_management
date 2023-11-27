@@ -135,6 +135,8 @@ DROP FUNCTION IF EXISTS update_person_position_history (person_position_history_
 
 DROP FUNCTION IF EXISTS insert_report (report_title text, report_contents text, person_sender_name text, person_receiver_name text) CASCADE;
 
+DROP FUNCTION IF EXISTS insert_report (report_title text, report_contents text, person_sender_id integer, person_receiver_id integer) CASCADE;
+
 DROP FUNCTION IF EXISTS update_report_to_delivered (report_id integer) CASCADE;
 
 DROP FUNCTION IF EXISTS insert_building_type (building_type_name text) CASCADE;

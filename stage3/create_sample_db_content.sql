@@ -202,58 +202,90 @@ $$
     SELECT person_id FROM person_position_history WHERE position_id = get_position_id_by_name('Protofilarch') ORDER BY random();
 $$ language sql;
 
-CREATE OR REPLACE FUNCTION generate_utopian_people (min_people_amount integer, max_people_amount integer, family_size integer) RETURNS void AS
+CREATE OR REPLACE FUNCTION insert_50_people (names text[], country_id integer, family_id_val integer)RETURNS TABLE(id integer) AS
+$$
+    INSERT INTO person (name, motherland_id, family_id) VALUES
+    (names[50], country_id, family_id_val), (names[1], country_id, family_id_val), (names[2], country_id, family_id_val), (names[3], country_id, family_id_val),
+    (names[4], country_id, family_id_val), (names[5], country_id, family_id_val), (names[6], country_id, family_id_val), (names[7], country_id, family_id_val),
+    (names[8], country_id, family_id_val), (names[9], country_id, family_id_val), (names[10], country_id, family_id_val), (names[11], country_id, family_id_val),
+    (names[12], country_id, family_id_val), (names[13], country_id, family_id_val), (names[14], country_id, family_id_val), (names[15], country_id, family_id_val),
+    (names[16], country_id, family_id_val), (names[17], country_id, family_id_val), (names[18], country_id, family_id_val), (names[19], country_id, family_id_val),
+    (names[20], country_id, family_id_val), (names[21], country_id, family_id_val), (names[22], country_id, family_id_val), (names[23], country_id, family_id_val),
+    (names[24], country_id, family_id_val), (names[25], country_id, family_id_val), (names[26], country_id, family_id_val), (names[27], country_id, family_id_val),
+    (names[28], country_id, family_id_val), (names[29], country_id, family_id_val), (names[30], country_id, family_id_val), (names[31], country_id, family_id_val),
+    (names[32], country_id, family_id_val), (names[33], country_id, family_id_val), (names[34], country_id, family_id_val), (names[35], country_id, family_id_val),
+    (names[36], country_id, family_id_val), (names[37], country_id, family_id_val), (names[38], country_id, family_id_val), (names[39], country_id, family_id_val),
+    (names[40], country_id, family_id_val), (names[41], country_id, family_id_val), (names[42], country_id, family_id_val), (names[43], country_id, family_id_val),
+    (names[44], country_id, family_id_val), (names[45], country_id, family_id_val), (names[46], country_id, family_id_val), (names[47], country_id, family_id_val),
+    (names[48], country_id, family_id_val), (names[49], country_id, family_id_val) RETURNING id;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION insert_50_positions (ids integer[], pos_id integer, hire_date_ date, dismissal_date_ date) RETURNS void AS
+$$
+    INSERT INTO person_position_history (person_id, position_id, hire_date, dismissal_date) VALUES
+    (ids[50], pos_id, hire_date_, dismissal_date_), (ids[1], pos_id, hire_date_, dismissal_date_), (ids[2], pos_id, hire_date_, dismissal_date_), (ids[3], pos_id, hire_date_, dismissal_date_),
+    (ids[4], pos_id, hire_date_, dismissal_date_), (ids[5], pos_id, hire_date_, dismissal_date_), (ids[6], pos_id, hire_date_, dismissal_date_), (ids[7], pos_id, hire_date_, dismissal_date_),
+    (ids[8], pos_id, hire_date_, dismissal_date_), (ids[9], pos_id, hire_date_, dismissal_date_), (ids[10], pos_id, hire_date_, dismissal_date_), (ids[11], pos_id, hire_date_, dismissal_date_),
+    (ids[12], pos_id, hire_date_, dismissal_date_), (ids[13], pos_id, hire_date_, dismissal_date_), (ids[14], pos_id, hire_date_, dismissal_date_), (ids[15], pos_id, hire_date_, dismissal_date_),
+    (ids[16], pos_id, hire_date_, dismissal_date_), (ids[17], pos_id, hire_date_, dismissal_date_), (ids[18], pos_id, hire_date_, dismissal_date_), (ids[19], pos_id, hire_date_, dismissal_date_),
+    (ids[20], pos_id, hire_date_, dismissal_date_), (ids[21], pos_id, hire_date_, dismissal_date_), (ids[22], pos_id, hire_date_, dismissal_date_), (ids[23], pos_id, hire_date_, dismissal_date_),
+    (ids[24], pos_id, hire_date_, dismissal_date_), (ids[25], pos_id, hire_date_, dismissal_date_), (ids[26], pos_id, hire_date_, dismissal_date_), (ids[27], pos_id, hire_date_, dismissal_date_),
+    (ids[28], pos_id, hire_date_, dismissal_date_), (ids[29], pos_id, hire_date_, dismissal_date_), (ids[30], pos_id, hire_date_, dismissal_date_), (ids[31], pos_id, hire_date_, dismissal_date_),
+    (ids[32], pos_id, hire_date_, dismissal_date_), (ids[33], pos_id, hire_date_, dismissal_date_), (ids[34], pos_id, hire_date_, dismissal_date_), (ids[35], pos_id, hire_date_, dismissal_date_),
+    (ids[36], pos_id, hire_date_, dismissal_date_), (ids[37], pos_id, hire_date_, dismissal_date_), (ids[38], pos_id, hire_date_, dismissal_date_), (ids[39], pos_id, hire_date_, dismissal_date_),
+    (ids[40], pos_id, hire_date_, dismissal_date_), (ids[41], pos_id, hire_date_, dismissal_date_), (ids[42], pos_id, hire_date_, dismissal_date_), (ids[43], pos_id, hire_date_, dismissal_date_),
+    (ids[44], pos_id, hire_date_, dismissal_date_), (ids[45], pos_id, hire_date_, dismissal_date_), (ids[46], pos_id, hire_date_, dismissal_date_), (ids[47], pos_id, hire_date_, dismissal_date_),
+    (ids[48], pos_id, hire_date_, dismissal_date_), (ids[49], pos_id, hire_date_, dismissal_date_);
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION generate_utopian_people (max_people_amount integer, family_size integer) RETURNS void AS
 $$
     DECLARE
-        k integer;
-        array_index integer;
-        added_person_id integer;
+        i integer;
+        country_id integer = get_country_id_by_name('Utopia');
+        added_person_ids integer ARRAY[50];
         position_id integer;
         craft_type_id integer;
-        craft_types_id integer[] = ARRAY [
-            get_craft_type_id_id_by_name('Gardening'), get_craft_type_id_id_by_name('Farming'),
-            get_craft_type_id_id_by_name('Livestock'), get_craft_type_id_id_by_name('Copper'),
-            get_craft_type_id_id_by_name('Factory work'), get_craft_type_id_id_by_name('Crafting'),
-            get_craft_type_id_id_by_name('Teaching'), get_craft_type_id_id_by_name('Servicing')];
-        available_families integer[] = ARRAY [
-            insert_family('Gardening', get_random_filarch()), insert_family('Farming', get_random_filarch()),
-            insert_family('Livestock', get_random_filarch()), insert_family('Copper', get_random_filarch()),
-            insert_family('Factory work', get_random_filarch()), insert_family('Crafting', get_random_filarch()),
-            insert_family('Teaching', get_random_filarch()), insert_family('Servicing', get_random_filarch())];
-        places_in_family integer[] = ARRAY [
-            0, 0,
-            0, 0,
-            0, 0,
-            0, 0];
+        family_id integer;
+        new_people_names text ARRAY[50];
     BEGIN
+        ALTER TABLE person DROP CONSTRAINT person_family_id_fkey;
+        ALTER TABLE person DROP CONSTRAINT person_motherland_id_fkey;
+        ALTER TABLE person_position_history DROP CONSTRAINT person_position_history_person_id_fkey;
+        ALTER TABLE person_position_history DROP CONSTRAINT person_position_history_position_id_fkey;
+        ALTER TABLE person_position_history DROP CONSTRAINT is_after_hire;
+        ALTER TABLE family DROP CONSTRAINT family_craft_type_id_fkey;
+        ALTER TABLE family DROP CONSTRAINT responsible_foreign_key;
+
         IF family_size < 1
             THEN RAISE EXCEPTION 'Family size can not be less then 1.';
         END IF;
-        FOR i IN min_people_amount..get_random_int_in_range(min_people_amount,max_people_amount) LOOP
+        FOR i IN (SELECT * FROM generate_series(0, max_people_amount, family_size)) LOOP
             SELECT get_random_utopian_position_id() INTO position_id;
             SELECT get_craft_type_id_by_position(position_id) INTO craft_type_id;
-            FOR k in 0..array_length(craft_types_id, 1) LOOP
-                IF craft_type_id = craft_types_id[k]
-                    THEN
-                        array_index = k;
-                        EXIT;
-                END IF;
+            SELECT insert_family(craft_type_id, get_random_filarch()) INTO family_id;
+
+            FOR k in 0..family_size LOOP
+                new_people_names[k] = get_random_string_with_delimiter();
                 end loop;
---             RAISE INFO '% arr ind', array_index;
-            SELECT insert_person(get_random_string_with_delimiter(), 'Utopia', available_families[array_index]) INTO added_person_id;
-            places_in_family[array_index] = places_in_family[array_index] + 1;
-            IF places_in_family[array_index] >= family_size
-                THEN
-                    PERFORM craft_types_id[array_index] = insert_family(craft_types_id[array_index], get_random_filarch());
-                    PERFORM places_in_family[array_index] = 0;
-            end if;
-            PERFORM _insert_position_history(added_person_id, position_id, CURRENT_DATE);
-            PERFORM _insert_position_history(added_person_id, get_random_utopian_position_id(), CURRENT_DATE - get_random_int_in_range(1, 10));
+            SELECT array(SELECT id FROM insert_50_people(new_people_names, country_id, family_id)) INTO added_person_ids;
+            RAISE info 'some id:%', added_person_ids[50];
+
+            PERFORM insert_50_positions(added_person_ids, position_id, CURRENT_DATE, NULL);
+            PERFORM insert_50_positions(added_person_ids, get_random_utopian_position_id(), CURRENT_DATE-get_random_int_in_range(3, 15), CURRENT_DATE);
         end loop;
-    END
+
+        ALTER TABLE person ADD CONSTRAINT person_family_id_fkey FOREIGN KEY (family_id) REFERENCES family ON UPDATE CASCADE ON DELETE SET NULL;
+        ALTER TABLE person ADD CONSTRAINT person_motherland_id_fkey FOREIGN KEY (motherland_id) REFERENCES Country ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE person_position_history ADD CONSTRAINT person_position_history_person_id_fkey FOREIGN KEY (person_id) REFERENCES Person ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE person_position_history ADD CONSTRAINT person_position_history_position_id_fkey foreign key (position_id) REFERENCES Position (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE person_position_history ADD CONSTRAINT is_after_hire CHECK (hire_date <= dismissal_date);
+        ALTER TABLE family ADD CONSTRAINT family_craft_type_id_fkey foreign key (craft_type_id) REFERENCES Craft_type (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE family ADD CONSTRAINT responsible_foreign_key foreign key(responsible_person_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET NULL;
+    END;
 $$ LANGUAGE plpgsql;
 
-SELECT generate_utopian_people(9000, 11000, 40);
+SELECT generate_utopian_people(10000, 10000, 40);
 
 -- SELECT insert_family('Farming', VARIADIC ARRAY[
 --     ( SELECT id from person where name = 'Kopatich')
@@ -261,22 +293,42 @@ SELECT generate_utopian_people(9000, 11000, 40);
 
 CREATE OR REPLACE FUNCTION generate_building_construction_artefacts(min_amount integer, max_amount integer, building_type_name text) RETURNS void AS
 $$
+    DECLARE
+        res_id integer;
+        sen_id integer;
     BEGIN
-        FOR i IN 1..get_random_int_in_range(min_amount, max_amount) LOOP
-            PERFORM insert_building_construction_artefact(get_random_protofilarch(), building_type_name, CURRENT_DATE);
+        ALTER TABLE building DROP CONSTRAINT building_building_type_id_fkey;
+        ALTER TABLE building_construction_artefact DROP CONSTRAINT building_construction_artefact_building_id_fkey;
+        ALTER TABLE building_construction_artefact DROP CONSTRAINT building_construction_artefact_responsible_person_id_fkey;
+        ALTER TABLE building_construction_artefact DROP CONSTRAINT is_construction_date_range_correct;
+        ALTER TABLE report DROP Constraint report_receiver_id_fkey;
+        ALTER TABLE report DROP CONSTRAINT report_sender_id_fkey;
+
+        SELECT get_random_protofilarch() INTO sen_id;
+        FOR i IN 0..max_amount LOOP
+            SELECT get_random_protofilarch() into res_id;
+            PERFORM insert_building_construction_artefact(res_id, building_type_name, CURRENT_DATE);
+            PERFORM insert_report('Building construction', 'Build the ' || building_type_name, sen_id, res_id);
         end loop;
+
+        ALTER TABLE building ADD CONSTRAINT building_building_type_id_fkey FOREIGN KEY (building_type_id) REFERENCES Building_type (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+        ALTER TABLE building_construction_artefact ADD CONSTRAINT building_construction_artefact_building_id_fkey FOREIGN KEY (building_id) REFERENCES Building (id) ON UPDATE CASCADE ON DELETE SET NULL;
+        ALTER TABLE building_construction_artefact ADD CONSTRAINT building_construction_artefact_responsible_person_id_fkey FOREIGN KEY(responsible_person_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET NULL;
+        ALTER TABLE building_construction_artefact ADD CONSTRAINT is_construction_date_range_correct CHECK ( construction_beginning_date <= construction_end_date );
+        ALTER TABLE report ADD Constraint report_receiver_id_fkey FOREIGN KEY (receiver_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET NULL;
+        ALTER TABLE report ADD CONSTRAINT report_sender_id_fkey FOREIGN KEY (sender_id) REFERENCES Person (id) ON UPDATE CASCADE ON DELETE SET NULL;
     end;
 $$ language plpgsql;
 
-SELECT generate_building_construction_artefacts(15, 30, 'Farm');
-SELECT generate_building_construction_artefacts(50, 100, 'Living');
-SELECT generate_building_construction_artefacts(10, 15, 'School');
-SELECT generate_building_construction_artefacts(6, 8, 'Administrative');
-SELECT generate_building_construction_artefacts(2, 5, 'Pub');
-SELECT generate_building_construction_artefacts(10, 40, 'Workshop');
-SELECT generate_building_construction_artefacts(15, 25, 'Mine');
-SELECT generate_building_construction_artefacts(12, 20, 'Factory');
-SELECT generate_building_construction_artefacts(3, 8, 'Garden');
+SELECT generate_building_construction_artefacts(2500, 2500, 'Farm');
+SELECT generate_building_construction_artefacts(2500, 2500, 'Living');
+SELECT generate_building_construction_artefacts(500, 500, 'School');
+SELECT generate_building_construction_artefacts(50, 50, 'Administrative');
+SELECT generate_building_construction_artefacts(25, 25, 'Pub');
+SELECT generate_building_construction_artefacts(2000, 2000, 'Workshop');
+SELECT generate_building_construction_artefacts(1000, 1000, 'Mine');
+SELECT generate_building_construction_artefacts(500, 500, 'Factory');
+SELECT generate_building_construction_artefacts(500, 500, 'Garden');
 
 CREATE OR REPLACE FUNCTION generate_people_detachment_to_building() RETURNS void AS
 $$
@@ -297,17 +349,17 @@ CREATE OR REPLACE FUNCTION generate_resources_to_families(min_resource_amount do
 $$
     DECLARE
         _family_id integer;
-        _resource_id integer;
     BEGIN
         FOR _family_id in SELECT id FROM Family LOOP
-            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Water', get_random_double_in_range(min_resource_amount, max_resource_amount))));
-            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Food', get_random_double_in_range(min_resource_amount, max_resource_amount))));
-            PERFORM insert_family_resource_ownership(_family_id, (SELECT get_resource_from_resource_storage('Wood', get_random_double_in_range(min_resource_amount, max_resource_amount))));
-        end loop;
+            INSERT INTO family_resource_ownership (family_id, resource_id)
+                VALUES (_family_id, get_resource_from_resource_storage('Water', max_resource_amount)),
+                    (_family_id, get_resource_from_resource_storage('Food', max_resource_amount)),
+                    (_family_id, get_resource_from_resource_storage('Wood', max_resource_amount));
+            end loop;
     end;
 $$ language plpgsql;
 
-SELECT generate_resources_to_families(50, 150);
+SELECT generate_resources_to_families(10, 10);
 
 SELECT insert_event_group('Antanta');
 SELECT insert_event_group('Bechennie');
@@ -322,20 +374,20 @@ SELECT insert_event_group_countries('Crutie', 'Finland');
 SELECT insert_event_group_countries('Crutie', 'Great Britain');
 SELECT insert_event_group_countries('Ne pri delah', 'Utopia');
 
--- CREATE OR REPLACE FUNCTION generate_country_relationships (min_amount integer, max_amount integer) RETURNS void AS
--- $$
---     DECLARE
---         chance double precision;
--- BEGIN
---     For i in 1..get_random_int_in_range(min_amount, max_amount) LOOP
---         SELECT get_random_double_in_range(0, 1) INTO chance;
---         if chance > 0.9
---             THEN PERFORM insert_country_relationship_event('War', CURRENT_DATE,
---                                                            VARIADIC ARRAY [ge]) ;
---         end loop;
--- end;
---
--- $$ language plpgsql;
+CREATE OR REPLACE FUNCTION generate_country_relationships (min_amount integer, max_amount integer) RETURNS void AS
+$$
+    DECLARE
+        chance double precision;
+BEGIN
+    For i in 1..get_random_int_in_range(min_amount, max_amount) LOOP
+        SELECT get_random_double_in_range(0, 1) INTO chance;
+        if chance > 0.9
+            THEN PERFORM insert_country_relationship_event('War', CURRENT_DATE,
+                                                           VARIADIC ARRAY [ge]) ;
+        end loop;
+end;
+
+$$ language plpgsql;
 
 SELECT insert_country_relationship_event('War', make_date(2020, 11, 8),
                                          Variadic ARRAY[get_event_group_id_by_name('Antanta'), get_event_group_id_by_name('Bechennie')]);

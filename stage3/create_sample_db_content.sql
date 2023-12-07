@@ -285,7 +285,7 @@ $$
     END;
 $$ LANGUAGE plpgsql;
 
-SELECT generate_utopian_people(10000, 10000, 50);
+SELECT generate_utopian_people(10000, 50);
 
 -- SELECT insert_family('Farming', VARIADIC ARRAY[
 --     ( SELECT id from person where name = 'Kopatich')

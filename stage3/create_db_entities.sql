@@ -141,7 +141,7 @@ ALTER TABLE Family
 CREATE TABLE IF NOT Exists Position
 (
     id   SERIAL,
-    name text UNIQUE NOT NULL,
+    name text NOT NULL,
     PRIMARY KEY (id)
 );
 

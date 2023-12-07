@@ -168,6 +168,8 @@ DROP FUNCTION IF EXISTS get_random_foreign_position_id() CASCADE;
 
 DROP FUNCTION IF EXISTS generate_resource_storages(min_amount integer, max_amount integer, min_quantity double precision, max_quantity double precision, _resource_type_name text) CASCADE;
 
+DROP FUNCTION IF EXISTS generate_positions(amount integer) CASCADE;
+
 DROP FUNCTION IF EXISTS generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) CASCADE;
 
 DROP FUNCTION IF EXISTS generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) CASCADE;

@@ -156,6 +156,19 @@ SELECT _insert_position_history('Karl IV', 'Foreign king', make_date(1998, 5, 30
 SELECT _insert_position_history('Victoria II', 'Foreign king', make_date(2002, 4, 17));
 SELECT _insert_position_history('Ambrozius The Great', 'Kniaz', make_date(2000, 4, 17));
 
+CREATE OR REPLACE FUNCTION generate_positions(amount integer) RETURNS void AS
+$$
+    DECLARE
+    BEGIN
+        FOR i IN 1..amount/10 LOOP
+            INSERT INTO position (name) VALUES (get_random_string(5)), (get_random_string(6)), (get_random_string(7)), (get_random_string(8)),
+                                               (get_random_string(9)), (get_random_string(10)), (get_random_string(11)), (get_random_string(12)),
+                                               (get_random_string(13)), (get_random_string(14));
+            end loop;
+    end;
+$$ LANGUAGE plpgsql;
+
+SELECT generate_positions(10000);
 
 CREATE OR REPLACE FUNCTION generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) RETURNS void AS
 $$

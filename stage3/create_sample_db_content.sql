@@ -121,12 +121,12 @@ $$
     end;
 $$ language plpgsql;
 
-SELECT generate_resource_storages(5, 10, 100, 1500, 'Gold');
-SELECT generate_resource_storages(40, 100, 10000, 2000000, 'Water');
-SELECT generate_resource_storages(20, 50, 50000, 450000, 'Wood');
-SELECT generate_resource_storages(40, 100, 1500, 300000, 'Food');
-SELECT generate_resource_storages(3, 20, 300, 10000, 'Oil');
-SELECT generate_resource_storages(10, 30, 2000, 100000, 'Stone');
+SELECT generate_resource_storages(10000, 20000, 300, 1500, 'Gold');
+SELECT generate_resource_storages(10000, 20000, 10000, 2000000, 'Water');
+SELECT generate_resource_storages(10000, 20000, 50000, 450000, 'Wood');
+SELECT generate_resource_storages(10000, 20000, 1500, 300000, 'Food');
+SELECT generate_resource_storages(10000, 20000, 300, 10000, 'Oil');
+SELECT generate_resource_storages(10000, 20000, 2000, 100000, 'Stone');
 
 SELECT insert_country('Utopia');
 SELECT insert_country('Poland');

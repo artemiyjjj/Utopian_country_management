@@ -168,7 +168,21 @@ $$
     end;
 $$ LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION generate_political_statuses (amount integer) RETURNS void AS
+$$
+    DECLARE
+    BEGIN
+        FOR i IN 1..amount/10 LOOP
+            INSERT INTO political_status (name) VALUES (get_random_string(5)), (get_random_string(6)), (get_random_string(7)), (get_random_string(8)),
+                                               (get_random_string(9)), (get_random_string(10)), (get_random_string(11)), (get_random_string(12)),
+                                               (get_random_string(13)), (get_random_string(14));
+            end loop;
+    end;
+$$ LANGUAGE plpgsql;
+
 SELECT generate_positions(10000);
+
+SELECT generate_political_statuses(10000);
 
 CREATE OR REPLACE FUNCTION generate_foreign_people (min_people_amount integer, max_people_amount integer, country_name text) RETURNS void AS
 $$

@@ -205,3 +205,11 @@ CREATE TABLE IF NOT EXISTS People_detachment_to_building
     PRIMARY KEY (person_id, building_id)
 );
 
+
+CREATE TABLE IF NOT EXISTS Users
+(
+    user_id integer REFERENCES Person (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    user_password text NOT NULL,
+    PRIMARY KEY (user_id)
+)
+

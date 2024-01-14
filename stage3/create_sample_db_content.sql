@@ -297,6 +297,7 @@ $$
                 end loop;
             SELECT array(SELECT id FROM insert_50_people(new_people_names, country_id, family_id)) INTO added_person_ids;
             RAISE info 'some id:%', added_person_ids[50];
+            Raise info 'family id:%', family_id;
 
             PERFORM insert_50_positions(added_person_ids, position_id, CURRENT_DATE, NULL);
             PERFORM insert_50_positions(added_person_ids, get_random_utopian_position_id(), CURRENT_DATE-get_random_int_in_range(3, 15), CURRENT_DATE);
@@ -318,11 +319,64 @@ SELECT generate_utopian_people(10000, 50);
 --     ( SELECT id from person where name = 'Kopatich')
 --     ]::integer[]);
 
+CREATE OR REPLACE FUNCTION insert_building_batching_50(building_type_ integer) RETURNS TABLE(id integer) AS
+$$
+    INSERT INTO building (building_type_id) VALUES (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_),
+          (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_),
+          (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_),
+        (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_),
+        (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_),
+        (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_), (building_type_) RETURNING id;
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION insert_building_construction_artefacts_batching_50(buildings_id integer[], res_pers_id_ integer, construction_beginning_date_ date) RETURNS void AS
+$$
+    INSERT INTO building_construction_artefact
+        (building_id, responsible_person_id, construction_beginning_date)
+    VALUES (buildings_id[1], res_pers_id_, construction_beginning_date_), (buildings_id[2], res_pers_id_, construction_beginning_date_), (buildings_id[3], res_pers_id_, construction_beginning_date_),
+           (buildings_id[4], res_pers_id_, construction_beginning_date_), (buildings_id[5], res_pers_id_, construction_beginning_date_), (buildings_id[6], res_pers_id_, construction_beginning_date_),
+           (buildings_id[7], res_pers_id_, construction_beginning_date_), (buildings_id[8], res_pers_id_, construction_beginning_date_), (buildings_id[9], res_pers_id_, construction_beginning_date_),
+           (buildings_id[10], res_pers_id_, construction_beginning_date_), (buildings_id[11], res_pers_id_, construction_beginning_date_), (buildings_id[12], res_pers_id_, construction_beginning_date_),
+           (buildings_id[13], res_pers_id_, construction_beginning_date_), (buildings_id[14], res_pers_id_, construction_beginning_date_), (buildings_id[15], res_pers_id_, construction_beginning_date_),
+           (buildings_id[16], res_pers_id_, construction_beginning_date_), (buildings_id[17], res_pers_id_, construction_beginning_date_), (buildings_id[18], res_pers_id_, construction_beginning_date_),
+           (buildings_id[19], res_pers_id_, construction_beginning_date_), (buildings_id[20], res_pers_id_, construction_beginning_date_), (buildings_id[21], res_pers_id_, construction_beginning_date_),
+           (buildings_id[22], res_pers_id_, construction_beginning_date_), (buildings_id[23], res_pers_id_, construction_beginning_date_), (buildings_id[24], res_pers_id_, construction_beginning_date_),
+           (buildings_id[25], res_pers_id_, construction_beginning_date_), (buildings_id[26], res_pers_id_, construction_beginning_date_), (buildings_id[27], res_pers_id_, construction_beginning_date_),
+           (buildings_id[28], res_pers_id_, construction_beginning_date_), (buildings_id[29], res_pers_id_, construction_beginning_date_), (buildings_id[30], res_pers_id_, construction_beginning_date_),
+           (buildings_id[31], res_pers_id_, construction_beginning_date_), (buildings_id[32], res_pers_id_, construction_beginning_date_), (buildings_id[33], res_pers_id_, construction_beginning_date_),
+           (buildings_id[34], res_pers_id_, construction_beginning_date_), (buildings_id[35], res_pers_id_, construction_beginning_date_), (buildings_id[36], res_pers_id_, construction_beginning_date_),
+           (buildings_id[37], res_pers_id_, construction_beginning_date_), (buildings_id[38], res_pers_id_, construction_beginning_date_), (buildings_id[39], res_pers_id_, construction_beginning_date_),
+           (buildings_id[40], res_pers_id_, construction_beginning_date_), (buildings_id[41], res_pers_id_, construction_beginning_date_), (buildings_id[42], res_pers_id_, construction_beginning_date_),
+           (buildings_id[43], res_pers_id_, construction_beginning_date_), (buildings_id[44], res_pers_id_, construction_beginning_date_), (buildings_id[45], res_pers_id_, construction_beginning_date_),
+           (buildings_id[46], res_pers_id_, construction_beginning_date_), (buildings_id[47], res_pers_id_, construction_beginning_date_), (buildings_id[48], res_pers_id_, construction_beginning_date_),
+           (buildings_id[49], res_pers_id_, construction_beginning_date_), (buildings_id[50], res_pers_id_, construction_beginning_date_);
+$$ LANGUAGE sql;
+
+CREATE OR REPLACE FUNCTION insert_reports_batching_50(rep_title text, rep_desc text, sen_id integer, res_id integer) RETURNS void AS
+$$
+    INSERT INTO Report (title, contents, sender_id, receiver_id, delivered) VALUES (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE),
+        (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE), (rep_title, rep_desc, sen_id, res_id, FALSE);
+$$ LANGUAGE sql;
+
 CREATE OR REPLACE FUNCTION generate_building_construction_artefacts(min_amount integer, max_amount integer, building_type_name text) RETURNS void AS
 $$
     DECLARE
         res_id integer;
         sen_id integer;
+        building_type integer;
+        added_buildings_id integer ARRAY[50];
+        title text = 'Building construction';
     BEGIN
         ALTER TABLE building DROP CONSTRAINT building_building_type_id_fkey;
         ALTER TABLE building_construction_artefact DROP CONSTRAINT building_construction_artefact_building_id_fkey;
@@ -332,10 +386,12 @@ $$
         ALTER TABLE report DROP CONSTRAINT report_sender_id_fkey;
 
         SELECT get_random_protofilarch() INTO sen_id;
-        FOR i IN 0..max_amount LOOP
+        SELECT get_building_type_id_by_name(building_type_name) INTO building_type;
+        FOR i IN 0..max_amount/50 LOOP
             SELECT get_random_protofilarch() into res_id;
-            PERFORM insert_building_construction_artefact(res_id, building_type_name, CURRENT_DATE);
-            PERFORM insert_report('Building construction', 'Build the ' || building_type_name, sen_id, res_id);
+            SELECT array(SELECT id FROM insert_building_batching_50(building_type)) INTO added_buildings_id;
+            PERFORM insert_building_construction_artefacts_batching_50(added_buildings_id, res_id, CURRENT_DATE);
+            PERFORM insert_reports_batching_50(title, 'Build the ' || building_type_name, sen_id, res_id);
         end loop;
 
         ALTER TABLE building ADD CONSTRAINT building_building_type_id_fkey FOREIGN KEY (building_type_id) REFERENCES Building_type (id) ON UPDATE CASCADE ON DELETE RESTRICT;
